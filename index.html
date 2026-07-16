@@ -3535,5 +3535,15 @@
             });
         })
     </script>
+    <!-- Waline 留言板 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/waline@latest/dist/waline.css">
+<div id="waline"></div>
+<script src="https://cdn.jsdelivr.net/npm/waline@latest/dist/waline.js"></script>
+<script>
+Waline.init({
+  el: '#waline',
+  serverURL: 'https://waline1-lime.vercel.app/'
+});
+</script>
 </body>
 </html>
