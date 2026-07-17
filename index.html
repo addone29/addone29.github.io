@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>加一和她的星星</title>
-    <!-- Font Awesome 国内镜像加速 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== 全局修复：消除横向滚动 ===== */
-        html, body {
-            overflow-x: hidden;
-        }
         /* ===== 原有样式完全保留，一字不改 ===== */
         * {
             margin: 0;
@@ -195,6 +189,129 @@
             margin-bottom: 40px;
             color: #1a3463;
             letter-spacing: 2px;
+        }
+        .msg-form-area {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(26, 52, 99, 0.08);
+            margin-bottom: 50px;
+        }
+        .msg-input-group {
+            margin-bottom: 24px;
+        }
+        .msg-input-group label {
+            display: block;
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #223a66;
+        }
+        .msg-input-group input,
+        .msg-input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #c6d7f0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'SimSun', '宋体', serif;
+            background: #f9fbff;
+            transition: all 0.25s ease;
+        }
+        .msg-input-group input:focus,
+        .msg-input-group textarea:focus {
+            outline: none;
+            border-color: #1a3463;
+            box-shadow: 0 0 0 3px rgba(26, 52, 99, 0.12);
+            background: #fff;
+        }
+        .msg-input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .msg-input-group .hint-text {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+        .send-msg-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a3463, #2b508c);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .send-msg-btn:hover {
+            background: linear-gradient(135deg, #152a4f, #234272);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(26, 52, 99, 0.2);
+        }
+        .all-msg-list {
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .single-msg-item {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(26, 52, 99, 0.06);
+            border-left: 5px solid #1a3463;
+            transition: 0.2s;
+            position: relative;
+        }
+        .single-msg-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(26, 52, 99, 0.1);
+        }
+        .msg-name-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a3463;
+        }
+        .msg-time-text {
+            font-size: 13px;
+            color: #7086ab;
+            margin-bottom: 12px;
+        }
+        .msg-content-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #2c3b52;
+        }
+        .no-msg-tip {
+            text-align: center;
+            padding: 60px 0;
+            font-size: 17px;
+            color: #647ca3;
+            letter-spacing: 1px;
+        }
+        /* 删除按钮 */
+        .delete-msg-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(220, 80, 80, 0.06);
+            border: 1px solid rgba(220, 80, 80, 0.15);
+            color: #b34a4a;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'SimSun', '宋体', serif;
+            letter-spacing: 0.5px;
+        }
+        .delete-msg-btn:hover {
+            background: rgba(220, 80, 80, 0.12);
+            border-color: rgba(220, 80, 80, 0.3);
+            color: #a13333;
         }
 
         .intro-wrap-stack {
@@ -1663,29 +1780,159 @@
             .fan-container { padding: 0 16px; }
             .fan-quote p { font-size: 16px; }
         }
-        /* ===== 留言板 Waline 样式微调 ===== */
-        #waline {
-            margin-top: 20px;
-        }
-        #waline .wl-panel {
+        /* ===== 账号系统样式 (仅新增部分，不改动原有) ===== */
+        .auth-area {
             background: #ffffff;
+            padding: 20px 32px;
             border-radius: 16px;
             box-shadow: 0 4px 16px rgba(26, 52, 99, 0.08);
-            padding: 20px 24px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px 12px;
         }
-        #waline .wl-btn {
-            background: linear-gradient(135deg, #1a3463, #2b508c);
+        .auth-status {
+            font-size: 16px;
+            color: #223a66;
+        }
+        .auth-status strong {
+            color: #1a3463;
+        }
+        .auth-btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .auth-btn {
+            padding: 8px 20px;
+            background: #e9f2fb;
+            border: 1px solid #c6d7f0;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a3463;
+            font-family: 'SimSun', '宋体', serif;
+        }
+        .auth-btn:hover {
+            background: #d4e2f5;
+            border-color: #1a3463;
+        }
+        .auth-btn.primary {
+            background: #1a3463;
+            color: #fff;
+            border-color: #1a3463;
+        }
+        .auth-btn.primary:hover {
+            background: #152a4f;
+        }
+        .auth-btn.danger {
+            background: rgba(220, 80, 80, 0.08);
+            border-color: rgba(220, 80, 80, 0.2);
+            color: #b34a4a;
+        }
+        .auth-btn.danger:hover {
+            background: rgba(220, 80, 80, 0.15);
+        }
+        .auth-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .auth-modal.active {
+            display: flex;
+        }
+        .auth-modal-box {
+            background: #fff;
+            padding: 32px 36px;
+            border-radius: 20px;
+            width: min(92%, 420px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .auth-modal-box h3 {
+            font-size: 24px;
+            color: #1a3463;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .auth-modal-box .msg-input-group {
+            margin-bottom: 16px;
+        }
+        .auth-modal-box .msg-input-group label {
+            font-size: 15px;
+        }
+        .auth-modal-box .auth-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a3463;
             color: #fff;
             border: none;
             border-radius: 30px;
-            padding: 8px 24px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: 0.2s;
+            margin-top: 6px;
         }
-        #waline .wl-btn:hover {
-            background: linear-gradient(135deg, #152a4f, #234272);
-            transform: translateY(-2px);
+        .auth-modal-box .auth-submit-btn:hover {
+            background: #152a4f;
+        }
+        .auth-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 26px;
+            color: #888;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .auth-modal-close:hover {
+            color: #1a1a1a;
+        }
+        .auth-error {
+            color: #b34a4a;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+        .auth-error.show {
+            display: block;
+        }
+        .auth-success {
+            color: #2a7a4a;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+        .auth-success.show {
+            display: block;
+        }
+        .msg-form-area .hidden {
+            display: none !important;
+        }
+        @media (max-width: 600px) {
+            .auth-area {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .auth-btn-group {
+                justify-content: center;
+            }
+            .auth-modal-box {
+                padding: 24px 20px;
+            }
         }
     </style>
 </head>
@@ -2002,7 +2249,7 @@
             <div class="fan-hero-overlay"></div>
             <div class="fan-hero-title">
                 <div class="main-title">十二周年</div>
-                <div class="en-sub">12TH DEBUT ANNIVERSARY</div>
+                <div class="en-sub">12TH DEBUT ANNIVERSARYY</div>
                 <div class="sub-desc">今年是我喜欢你的第四年</div>
             </div>
         </div>
@@ -2189,57 +2436,68 @@
         <div style="height: 40px;"></div>
     </div>
 
-    <!-- ===== 留言板（仅保留 Waline 评论系统） ===== -->
+    <!-- ===== 留言板（账号系统整合） ===== -->
     <div class="page-box" id="page-message">
         <div class="message-box-wrap">
             <h2 class="msg-title">留言板</h2>
-            <!-- Waline 评论系统 -->
-            <div id="waline"></div>
+
+            <!-- 账号状态栏 -->
+            <div class="auth-area" id="authArea">
+                <div class="auth-status" id="authStatus">👤 当前未登录</div>
+                <div class="auth-btn-group" id="authBtnGroup">
+                    <button class="auth-btn primary" id="authLoginBtn">登录</button>
+                    <button class="auth-btn" id="authRegisterBtn">注册</button>
+                    <button class="auth-btn danger" id="authLogoutBtn" style="display:none;">退出</button>
+                </div>
+            </div>
+
+            <!-- 发留言表单（登录后才可见） -->
+            <div class="msg-form-area" id="msgFormArea">
+                <div class="msg-input-group">
+                    <label>留言内容</label>
+                    <textarea id="msgContent" placeholder="如果你有什么话想对加一说，想对周深说，想对这个破破的小站说，或者是任何你想说的，就写在这里吧……"></textarea>
+                </div>
+                <div class="msg-input-group" style="display:none;">
+                    <label>删除密码</label>
+                    <input type="password" id="msgDeletePwd" placeholder="已使用登录密码">
+                    <div class="hint-text">删除留言时需验证登录密码</div>
+                </div>
+                <button class="send-msg-btn" id="submitMsgBtn">发送留言</button>
+            </div>
+
+            <!-- 留言列表 -->
+            <div class="all-msg-list" id="msgShowBox"></div>
         </div>
     </div>
 
-    <!-- Waline CSS & JS 国内镜像加速 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/waline@latest/dist/waline.css">
-    <script src="https://cdn.jsdelivr.net/npm/waline@latest/dist/waline.js"></script>
+    <!-- ===== 账号弹窗（注册/登录） ===== -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-box">
+            <button class="auth-modal-close" id="authModalClose">×</button>
+            <h3 id="authModalTitle">登录</h3>
+            <div class="msg-input-group">
+                <label>昵称</label>
+                <input type="text" id="authModalNick" placeholder="请输入昵称">
+            </div>
+            <div class="msg-input-group">
+                <label>密码</label>
+                <input type="password" id="authModalPwd" placeholder="请输入密码">
+            </div>
+            <div class="msg-input-group" id="authModalPwdConfirmGroup" style="display:none;">
+                <label>确认密码</label>
+                <input type="password" id="authModalPwdConfirm" placeholder="请再次输入密码">
+            </div>
+            <button class="auth-submit-btn" id="authModalSubmit">登录</button>
+            <div class="auth-error" id="authModalError"></div>
+            <div class="auth-success" id="authModalSuccess"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
     <script>
-        // Waline 初始化（完整配置）
-        Waline.init({
-            el: '#waline',
-            serverURL: 'https://waline1-lime.vercel.app/',
-            login: 'enable',
-            avatar: 'mp',
-            pageSize: 10,
-            uploadImage: false,
-            wordLimit: 200,
-            emoji: ['https://cdn.jsdelivr.net/npm/@waline/emojis@1.1.0/bilibili'],
-            locale: {
-                placeholder: '欢迎留下你的想法～（200字以内）',
-                nick: '昵称',
-                mail: '邮箱',
-                link: '网址',
-                submit: '提交',
-                reply: '回复',
-                cancelReply: '取消回复',
-                comments: '留言',
-                cancel: '取消',
-                confirm: '确认',
-                continue: '继续',
-                more: '加载更多',
-                login: '登录',
-                logout: '退出',
-                admin: '管理员',
-                debug: '调试',
-                error: '错误',
-                loading: '加载中',
-                noComment: '还没有留言，快来抢沙发吧！'
-            }
-        });
-    </script>
-    document.addEventListener('DOMContentLoaded',()=>{
-      document.querySelectorAll('img:not(.banner-img)').forEach(img=>img.loading="lazy")
-    })
-    <!-- Font Awesome 图标库（已通过 CDN 引入） -->
-    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            document.querySelectorAll('img:not(.banner-img)').forEach(img=>img.loading="lazy")
+        })
         // ===== 原有脚本完全保留，一字不改 =====
         // 页面切换
         const navBtns = document.querySelectorAll('[data-target]');
@@ -2936,6 +3194,348 @@
             } else {
                 document.addEventListener('DOMContentLoaded', initLifeGallery);
             }
+
+            // ===== 账号系统 (注册/登录/退出) =====
+            const authModal = document.getElementById('authModal');
+            const authModalClose = document.getElementById('authModalClose');
+            const authModalTitle = document.getElementById('authModalTitle');
+            const authModalNick = document.getElementById('authModalNick');
+            const authModalPwd = document.getElementById('authModalPwd');
+            const authModalPwdConfirm = document.getElementById('authModalPwdConfirm');
+            const authModalPwdConfirmGroup = document.getElementById('authModalPwdConfirmGroup');
+            const authModalSubmit = document.getElementById('authModalSubmit');
+            const authModalError = document.getElementById('authModalError');
+            const authModalSuccess = document.getElementById('authModalSuccess');
+
+            const authLoginBtn = document.getElementById('authLoginBtn');
+            const authRegisterBtn = document.getElementById('authRegisterBtn');
+            const authLogoutBtn = document.getElementById('authLogoutBtn');
+            const authStatus = document.getElementById('authStatus');
+
+            let authMode = 'login'; // 'login' or 'register'
+            let currentUser = null; // { nickname, password }
+
+            // 加载已登录用户
+            function loadCurrentUser() {
+                const saved = localStorage.getItem('currentUser');
+                if (saved) {
+                    try {
+                        currentUser = JSON.parse(saved);
+                        updateAuthUI();
+                        return true;
+                    } catch(e) {}
+                }
+                currentUser = null;
+                updateAuthUI();
+                return false;
+            }
+
+            function saveCurrentUser(user) {
+                if (user) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                } else {
+                    localStorage.removeItem('currentUser');
+                }
+                currentUser = user;
+                updateAuthUI();
+            }
+
+            function updateAuthUI() {
+                if (currentUser) {
+                    authStatus.innerHTML = `👤 欢迎，<strong>${currentUser.nickname}</strong>`;
+                    authLoginBtn.style.display = 'none';
+                    authRegisterBtn.style.display = 'none';
+                    authLogoutBtn.style.display = 'inline-block';
+                    document.getElementById('msgFormArea').style.display = 'block';
+                } else {
+                    authStatus.innerHTML = '👤 当前未登录';
+                    authLoginBtn.style.display = 'inline-block';
+                    authRegisterBtn.style.display = 'inline-block';
+                    authLogoutBtn.style.display = 'none';
+                    document.getElementById('msgFormArea').style.display = 'none';
+                }
+            }
+
+            // 用户数据库
+            function getUsers() {
+                return JSON.parse(localStorage.getItem('users')) || [];
+            }
+
+            function saveUsers(users) {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            function findUser(nickname) {
+                const users = getUsers();
+                return users.find(u => u.nickname === nickname);
+            }
+
+            function registerUser(nickname, password) {
+                const users = getUsers();
+                if (users.find(u => u.nickname === nickname)) {
+                    return false;
+                }
+                users.push({ nickname, password });
+                saveUsers(users);
+                return true;
+            }
+
+            function loginUser(nickname, password) {
+                const user = findUser(nickname);
+                if (user && user.password === password) {
+                    return user;
+                }
+                return null;
+            }
+
+            // 弹窗控制
+            function openAuthModal(mode) {
+                authMode = mode;
+                if (mode === 'login') {
+                    authModalTitle.textContent = '登录';
+                    authModalSubmit.textContent = '登录';
+                    authModalPwdConfirmGroup.style.display = 'none';
+                } else {
+                    authModalTitle.textContent = '注册';
+                    authModalSubmit.textContent = '注册';
+                    authModalPwdConfirmGroup.style.display = 'block';
+                }
+                authModalNick.value = '';
+                authModalPwd.value = '';
+                authModalPwdConfirm.value = '';
+                authModalError.classList.remove('show');
+                authModalSuccess.classList.remove('show');
+                authModal.classList.add('active');
+            }
+
+            function closeAuthModal() {
+                authModal.classList.remove('active');
+            }
+
+            authModalClose.addEventListener('click', closeAuthModal);
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) closeAuthModal();
+            });
+
+            authLoginBtn.addEventListener('click', () => openAuthModal('login'));
+            authRegisterBtn.addEventListener('click', () => openAuthModal('register'));
+
+            authLogoutBtn.addEventListener('click', () => {
+                if (confirm('确定要退出登录吗？')) {
+                    saveCurrentUser(null);
+                    loadMessage(); // 刷新留言列表
+                }
+            });
+
+            authModalSubmit.addEventListener('click', () => {
+                const nickname = authModalNick.value.trim();
+                const password = authModalPwd.value.trim();
+                const pwdConfirm = authModalPwdConfirm.value.trim();
+
+                authModalError.classList.remove('show');
+                authModalSuccess.classList.remove('show');
+
+                if (!nickname || !password) {
+                    authModalError.textContent = '请填写完整信息';
+                    authModalError.classList.add('show');
+                    return;
+                }
+                if (nickname.length < 2) {
+                    authModalError.textContent = '昵称至少2个字符';
+                    authModalError.classList.add('show');
+                    return;
+                }
+                if (password.length < 4) {
+                    authModalError.textContent = '密码至少4位';
+                    authModalError.classList.add('show');
+                    return;
+                }
+
+                if (authMode === 'register') {
+                    if (password !== pwdConfirm) {
+                        authModalError.textContent = '两次密码输入不一致';
+                        authModalError.classList.add('show');
+                        return;
+                    }
+                    if (findUser(nickname)) {
+                        authModalError.textContent = '该昵称已被注册，请更换';
+                        authModalError.classList.add('show');
+                        return;
+                    }
+                    const success = registerUser(nickname, password);
+                    if (success) {
+                        authModalSuccess.textContent = '🎉 注册成功！请登录';
+                        authModalSuccess.classList.add('show');
+                        // 自动切换到登录模式
+                        setTimeout(() => {
+                            openAuthModal('login');
+                        }, 800);
+                    } else {
+                        authModalError.textContent = '注册失败，请重试';
+                        authModalError.classList.add('show');
+                    }
+                } else {
+                    // 登录
+                    const user = loginUser(nickname, password);
+                    if (user) {
+                        saveCurrentUser(user);
+                        closeAuthModal();
+                        loadMessage();
+                    } else {
+                        authModalError.textContent = '昵称或密码错误';
+                        authModalError.classList.add('show');
+                    }
+                }
+            });
+
+            // 回车提交
+            authModalNick.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') authModalSubmit.click();
+            });
+            authModalPwd.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') authModalSubmit.click();
+            });
+            authModalPwdConfirm.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') authModalSubmit.click();
+            });
+
+            // ===== 留言板：删除时验证登录密码 =====
+            const ADMIN_PASSWORD = 'lanjiayi2005'; // 管理员密码
+
+            const submitMsgBtn = document.getElementById('submitMsgBtn');
+            const msgContent = document.getElementById('msgContent');
+            const msgShowBox = document.getElementById('msgShowBox');
+
+            function getMsgList() {
+                return JSON.parse(localStorage.getItem("msgList")) || [];
+            }
+
+            function saveMsgList(list) {
+                localStorage.setItem("msgList", JSON.stringify(list));
+            }
+
+            function loadMessage() {
+                const list = getMsgList();
+                msgShowBox.innerHTML = "";
+                if (list.length === 0) {
+                    msgShowBox.innerHTML = `<div class="no-msg-tip">暂时还没有留言，快来留下第一条吧</div>`;
+                    return;
+                }
+                list.forEach((item) => {
+                    if (!item.id) {
+                        item.id = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+                        saveMsgList(list);
+                    }
+                    const displayName = item.name || '匿名用户';
+                    const html = `
+                    <div class="single-msg-item" data-msg-id="${item.id}">
+                        <div class="msg-name-text">${displayName}</div>
+                        <div class="msg-time-text">${item.time}</div>
+                        <div class="msg-content-text">${item.content}</div>
+                        <button class="delete-msg-btn" data-msg-id="${item.id}">删除</button>
+                    </div>`;
+                    msgShowBox.innerHTML += html;
+                });
+
+                document.querySelectorAll('.delete-msg-btn').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const msgId = this.dataset.msgId;
+                        const list = getMsgList();
+                        const targetItem = list.find(item => item.id === msgId);
+                        if (!targetItem) {
+                            alert('留言不存在或已被删除');
+                            return;
+                        }
+
+                        // 检查当前用户是否有权限删除（发布者或管理员）
+                        let canDelete = false;
+                        if (currentUser) {
+                            if (targetItem.name === currentUser.nickname) {
+                                canDelete = true;
+                            }
+                        }
+
+                        // 弹窗：发布者密码 或 管理员密码
+                        const inputPwd = prompt(
+                            '请输入删除密码：\n' +
+                            '—— 如果你是发布者，请输入你的登录密码。\n' +
+                            '—— 如果你是管理员，请输入管理员密码。'
+                        );
+                        if (inputPwd === null) return;
+
+                        // 管理员密码
+                        if (inputPwd.trim() === ADMIN_PASSWORD) {
+                            const newList = list.filter(item => item.id !== msgId);
+                            saveMsgList(newList);
+                            loadMessage();
+                            alert('管理员已删除该留言');
+                            return;
+                        }
+
+                        // 发布者密码验证（使用登录密码）
+                        if (currentUser && targetItem.name === currentUser.nickname) {
+                            if (currentUser.password === inputPwd.trim()) {
+                                const newList = list.filter(item => item.id !== msgId);
+                                saveMsgList(newList);
+                                loadMessage();
+                                alert('留言已删除');
+                                return;
+                            } else {
+                                alert('密码错误，无法删除该留言');
+                                return;
+                            }
+                        }
+
+                        alert('你没有权限删除此留言，或密码错误');
+                    });
+                });
+            }
+            loadMessage();
+
+            if (submitMsgBtn) {
+                submitMsgBtn.addEventListener('click', () => {
+                    if (!currentUser) {
+                        alert('请先登录再留言');
+                        return;
+                    }
+                    const content = msgContent.value.trim();
+
+                    if (!content) {
+                        alert("留言内容不能为空");
+                        return;
+                    }
+
+                    const now = new Date();
+                    const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+                    const list = getMsgList();
+                    const newMsg = {
+                        name: currentUser.nickname,
+                        content: content,
+                        time: timeStr,
+                        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`
+                    };
+                    list.unshift(newMsg);
+                    saveMsgList(list);
+                    msgContent.value = "";
+                    loadMessage();
+                    alert('留言发布成功！');
+                });
+            }
+
+            // 加载当前用户
+            loadCurrentUser();
+
+            // 页面切换时刷新留言列表（保持数据一致性）
+            const observer = new MutationObserver(() => {
+                const msgPage = document.getElementById('page-message');
+                if (msgPage.classList.contains('active')) {
+                    loadMessage();
+                }
+            });
+            document.querySelectorAll('.page-box').forEach(page => {
+                observer.observe(page, { attributes: true, attributeFilter: ['class'] });
+            });
         })
     </script>
 </body>
