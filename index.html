@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加一和她的星星</title>
+    <style>
+        /* ===== 原有样式完全保留，一字不改 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SimSun', '宋体', serif;
+        }
+
+        header {
+            background: #1a3463;
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        header a {
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 15px;
+            padding: 6px 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-active {
+            background: #314b7c;
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: #fff !important;
+            text-decoration: none !important;
+            font-size: 15px;
+        }
+        header a:visited,
+        header a:active,
+        header a:focus,
+        .nav-active:visited,
+        .nav-active:active,
+        .nav-active:focus {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .page-box {
+            display: none;
+        }
+        .page-box.active {
+            display: block;
+        }
+
+        .banner {
+            width: 100%;
+            height: 600px;
+            background-color: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        .banner-wrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.6s ease;
+        }
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            object-fit: cover;
+            display: block;
+            object-position: center 50%;
+        }
+        .banner-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 60px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .banner-prev { left: 10px; }
+        .banner-next { right: 10px; }
+        .banner-btn:hover { background: rgba(0,0,0,0.5); }
+        .banner-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: none;
+            cursor: pointer;
+        }
+        .dot.active { background: #fff; }
+
+        .intro-wrap {
+            background: #e9f2fb;
+            background-image: radial-gradient(#bbd2ef 1px, transparent 1px);
+            background-size: 18px 18px;
+            padding: 10px 20px 40px;
+            text-align: center;
+        }
+        .intro-title {
+            font-size: 55px;
+            font-weight: 555;
+            color: #011f46;
+            margin-bottom: 8px;
+        }
+        .intro-sub {
+            font-size: 18px;
+            color: #444;
+            margin-bottom: 16px;
+        }
+        .intro-desc {
+            max-width: 720px;
+            margin: 0 auto 32px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .img-list {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .img-item {
+            width: 14%;
+            aspect-ratio: 3 / 9;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        .img-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: grayscale(100%);
+            transition: all 0.3s ease;
+        }
+        .img-item:hover img {
+            filter: grayscale(0%);
+            transform: scale(1.3);
+        }
+        footer {
+            background: #eef6fc;
+            text-align: center;
+            padding: 24px;
+            font-size: 12px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .message-box-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 60px 24px;
+            background: #f0f6fd;
+            min-height: calc(100vh - 600px);
+        }
+        .msg-title {
+            font-size: 38px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #1a3463;
+            letter-spacing: 2px;
+        }
+        .msg-form-area {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(26, 52, 99, 0.08);
+            margin-bottom: 50px;
+        }
+        .msg-input-group {
+            margin-bottom: 24px;
+        }
+        .msg-input-group label {
+            display: block;
+            font-size: 17px;
+            margin-bottom: 8px;
+            color: #223a66;
+        }
+        .msg-input-group input,
+        .msg-input-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #c6d7f0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'SimSun', '宋体', serif;
+            background: #f9fbff;
+            transition: all 0.25s ease;
+        }
+        .msg-input-group input:focus,
+        .msg-input-group textarea:focus {
+            outline: none;
+            border-color: #1a3463;
+            box-shadow: 0 0 0 3px rgba(26, 52, 99, 0.12);
+            background: #fff;
+        }
+        .msg-input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .msg-input-group .hint-text {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+        .send-msg-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a3463, #2b508c);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .send-msg-btn:hover {
+            background: linear-gradient(135deg, #152a4f, #234272);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(26, 52, 99, 0.2);
+        }
+        .all-msg-list {
+            gap: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .single-msg-item {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(26, 52, 99, 0.06);
+            border-left: 5px solid #1a3463;
+            transition: 0.2s;
+            position: relative;
+        }
+        .single-msg-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(26, 52, 99, 0.1);
+        }
+        .msg-name-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a3463;
+        }
+        .msg-time-text {
+            font-size: 13px;
+            color: #7086ab;
+            margin-bottom: 12px;
+        }
+        .msg-content-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #2c3b52;
+        }
+        .no-msg-tip {
+            text-align: center;
+            padding: 60px 0;
+            font-size: 17px;
+            color: #647ca3;
+            letter-spacing: 1px;
+        }
+        /* 删除按钮 */
+        .delete-msg-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(220, 80, 80, 0.06);
+            border: 1px solid rgba(220, 80, 80, 0.15);
+            color: #b34a4a;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'SimSun', '宋体', serif;
+            letter-spacing: 0.5px;
+        }
+        .delete-msg-btn:hover {
+            background: rgba(220, 80, 80, 0.12);
+            border-color: rgba(220, 80, 80, 0.3);
+            color: #a13333;
+        }
+
+        .intro-wrap-stack {
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 0;
+            background: #f7faff;
+            overflow-x: hidden;
+        }
+        .stack-title {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 60px;
+            color: #1a3463;
+        }
+        .bg-block {
+            position: absolute;
+            background: #000000;
+            border: 4px solid #000;
+            border-radius: 12px;
+        }
+        .bg-block.white {
+            background: #fff;
+            border: 4px solid #000000;
+            border-radius: 12px;
+        }
+        .bg-block-straight {
+            position: absolute;
+            background: #000000;
+            border-radius: 0;
+            z-index: 0;
+            aspect-ratio: 4 / 3;
+        }
+        .bg-block-straight.white {
+            background: #ffffff;
+            border-radius: 0;
+        }
+        .stack-item {
+            position: absolute;
+            padding: 10px 16px;
+            padding-top: 1px;
+            background: #fff;
+            border: 4px solid #000000;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'SimSun', '宋体', serif;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            aspect-ratio: 4 / 3;
+            z-index: 10;
+        }
+        .stack-item:hover {
+            transform: translateY(-13px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.29);
+        }
+        .stack-item.dark {
+            background: #000000;
+            color: #fff;
+            border-color: #000;
+        }
+        .pop-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .pop-mask.active {
+            display: flex;
+        }
+        .pop-box {
+            width: min(90%, 600px);
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            position: relative;
+        }
+        .pop-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 26px;
+            cursor: pointer;
+            color: #666;
+        }
+        .pop-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #223a66;
+            text-align: left;
+            white-space: pre-line;
+        }
+        .pop-text.center-text {
+            text-align: center;
+            text-indent: 0;
+        }
+
+        .timeline {
+            width: 100%;
+            padding: 0 10%;
+            margin-top: 0;
+            position: relative;
+            top: 720px;
+            z-index: 20;
+        }       
+        .timeline-item {
+            position: relative;
+            margin-bottom: 70px;
+            display:flex;
+            align-items:flex-start;
+        }
+        .timeline-left-wrap{
+            width:130px;
+            padding-right:10px;
+            flex-shrink:0;
+            position:relative;
+        }
+        .timeline-label {
+            font-size: 23px;
+            font-weight: bold;
+            background-color: #1a3463;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            width:100%;
+            text-align: center;
+        }
+        .timeline-right {
+            margin-left: 32px;
+            max-width: 1100px;
+        }
+        .timeline-img {
+            width: 260px;
+            aspect-ratio:4/3;
+            background: transparent;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            cursor:pointer;
+            transition:0.2s;
+            background-size: cover;
+            background-position: center;
+        }
+        .timeline-img:hover{
+            transform:scale(1.02);
+        }
+        .tag-group{
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin-bottom:14px;
+        }
+        .tag{
+            padding:4px 10px;
+            border-radius:4px;
+            font-size:14px;
+        }
+        .tag.green{background:#d8ead8;color:#207520;}
+        .tag.blue{background:#dbe6f5;color:#1a3463;}
+        .tag.orange{background:#ffeecd;color:#b36b00;}
+        .timeline-desc h3 {
+            font-size: 20px;
+            color: #1a3463;
+            margin-bottom: 12px;
+        }
+        .timeline-desc p {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.8;
+            text-indent: 0;
+        }
+
+        .img-modal{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.85);
+            z-index:99999;
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:30px;
+        }
+        .img-modal.active{
+            display:flex;
+        }
+        .img-modal img{
+            max-width:90%;
+            max-height:90vh;
+            border-radius:8px;
+            object-fit:contain;
+        }
+        .img-close{
+            position:absolute;
+            top:20px;
+            right:30px;
+            color:#fff;
+            font-size:36px;
+            cursor:pointer;
+        }
+
+        #page-member {
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6)),
+                url('img/黑背景.jpg') center center / cover no-repeat fixed;
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+        .coverflow-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .coverflow-wrap {
+            position: relative;
+            height: 520px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+            overflow: visible;
+        }
+        .cover-arrow {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            color: #eee;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 30;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .cover-arrow:hover {
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+        }
+        .cover-prev { left: 10px; }
+        .cover-next { right: 10px; }
+
+        .cover-list {
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
+        .cover-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 280px;
+            height: 280px;
+            aspect-ratio: 1 / 1;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+        }
+        .cover-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cover-item.active-center {
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 10;
+            opacity: 1;
+        }
+        .cover-item.side-left-1 {
+            transform: translate(-96%, -50%) scale(0.82);
+            z-index: 7;
+            opacity: 0.65;
+        }
+        .cover-item.side-left-2 {
+            transform: translate(-132%, -50%) scale(0.68);
+            z-index: 5;
+            opacity: 0.45;
+        }
+        .cover-item.side-left-3 {
+            transform: translate(-168%, -50%) scale(0.56);
+            z-index: 3;
+            opacity: 0.20;
+            pointer-events: none;
+        }
+        .cover-item.side-right-1 {
+            transform: translate(-4%, -50%) scale(0.82);
+            z-index: 7;
+            opacity: 0.65;
+        }
+        .cover-item.side-right-2 {
+            transform: translate(32%, -50%) scale(0.68);
+            z-index: 5;
+            opacity: 0.45;
+        }
+        .cover-item.side-right-3 {
+            transform: translate(68%, -50%) scale(0.56);
+            z-index: 3;
+            opacity: 0.20;
+            pointer-events: none;
+        }
+        .cover-item.far-left {
+            transform: translate(-210%, -50%) scale(0.40);
+            opacity: 0;
+            pointer-events: none;
+            visibility: visible;
+            z-index: 1;
+        }
+        .cover-item.far-right {
+            transform: translate(110%, -50%) scale(0.40);
+            opacity: 0;
+            pointer-events: none;
+            visibility: visible;
+            z-index: 1;
+        }
+
+        .album-info-area {
+            text-align: center;
+            margin: 20px 0 40px;
+            color: #eaeef3;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .album-title {
+            font-size: 34px;
+            color: #f0f4fa;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .album-author {
+            font-size: 16px;
+            color: #aab8c9;
+            margin-bottom: 24px;
+        }
+        .track-list {
+            max-width: 620px;
+            margin: 0 auto;
+        }
+        .track-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #d0d9e3;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            transition: 0.15s;
+            text-decoration: none;
+        }
+        .track-item:hover {
+            background: rgba(255,255,255,0.08);
+            padding-left: 6px;
+            border-radius: 4px;
+        }
+        .track-item a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            color: #d0d9e3;
+            text-decoration: none;
+        }
+        .track-item a:hover {
+            color: #fff;
+        }
+        .track-name-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .track-duration {
+            color: #8a9bb0;
+        }
+        .play-icon {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            color: #8ab4f8;
+        }
+        .album-intro-text {
+            max-width: 640px;
+            margin: 28px auto 10px;
+            padding: 0 16px;
+            font-size: 15px;
+            line-height: 1.9;
+            color: #e8ecf0;
+            text-align: center;
+            letter-spacing: 0.4px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+        }
+        .album-intro-text em {
+            color: #ffffff;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        @media (max-width:768px){
+            .cover-item {
+                width: 200px;
+                height: 200px;
+            }
+            .coverflow-wrap {
+                height: 400px;
+            }
+            .album-title {
+                font-size: 26px;
+            }
+            .cover-list {
+                width: 240px;
+                height: 240px;
+            }
+            .cover-item.side-left-1 { transform: translate(-100%, -50%) scale(0.78); }
+            .cover-item.side-left-2 { transform: translate(-140%, -50%) scale(0.62); }
+            .cover-item.side-left-3 { transform: translate(-180%, -50%) scale(0.48); }
+            .cover-item.side-right-1 { transform: translate(0%, -50%) scale(0.78); }
+            .cover-item.side-right-2 { transform: translate(40%, -50%) scale(0.62); }
+            .cover-item.side-right-3 { transform: translate(80%, -50%) scale(0.48); }
+            .cover-item.far-left { transform: translate(-230%, -50%) scale(0.30); }
+            .cover-item.far-right { transform: translate(130%, -50%) scale(0.30); }
+        }
+
+        /* ===== 相识相遇 · CoverFlow 竖条视频画廊（独立封装，不污染全局） ===== */
+        #album-gallery-root {
+            background: linear-gradient(160deg, #dceaff 0%, #b8d6f5 50%, #a0c8f0 100%);
+            min-height: 100vh;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #album-gallery-root .gallery-wrapper {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            padding: 20px 24px;
+            box-shadow: 0 20px 60px rgba(60, 120, 200, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            height: calc(100vh - 40px);
+            max-height: 900px;
+            display: flex;
+            align-items: center;
+        }
+        #album-gallery-root .gallery-row {
+            display: flex;
+            gap: 28px;
+            align-items: stretch;
+            flex-wrap: wrap;
+            width: 100%;
+            height: 100%;
+        }
+        #album-gallery-root .coverflow-col {
+            flex: 6;
+            min-width: 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+            overflow: hidden;
+        }
+        #album-gallery-root .coverflow-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+        #album-gallery-root .card-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+            will-change: transform;
+        }
+        #album-gallery-root .cover-card {
+            position: absolute;
+            width: 130px;
+            height: 425px;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 8px 30px rgba(40, 100, 180, 0.08), 0 2px 8px rgba(0,0,0,0.02);
+            overflow: hidden;
+            cursor: pointer;
+            transition: filter 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+            will-change: transform, filter, box-shadow;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            filter: grayscale(0.7) saturate(0.5);
+            transform-origin: center center;
+        }
+        #album-gallery-root .cover-card.center {
+            filter: grayscale(0) saturate(1);
+            transform: scale(1.08);
+            z-index: 25;
+            border-color: #ffffff;
+            box-shadow: 0 0 40px rgba(70, 150, 255, 0.20), 0 12px 40px rgba(40, 100, 200, 0.10);
+        }
+        #album-gallery-root .cover-thumb {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+        #album-gallery-root .cover-thumb i {
+            font-size: 32px;
+            color: rgba(60, 120, 200, 0.25);
+            transition: 0.3s;
+        }
+        #album-gallery-root .cover-card.center .cover-thumb i {
+            color: #3b82f6;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.25);
+            font-size: 44px;
+        }
+        #album-gallery-root .cover-card:not(.center) .cover-thumb i {
+            opacity: 0.2;
+            font-size: 22px;
+        }
+        #album-gallery-root .card-label {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            color: rgba(40, 80, 140, 0.25);
+            font-size: 11px;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 2px 10px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        #album-gallery-root .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            color: #2a6bb0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 30;
+            transition: 0.25s;
+            box-shadow: 0 4px 16px rgba(60, 120, 200, 0.06);
+        }
+        #album-gallery-root .nav-arrow:hover:not(.disabled) {
+            background: rgba(255, 255, 255, 0.85);
+            color: #1a4f8a;
+            box-shadow: 0 4px 20px rgba(40, 100, 200, 0.12);
+            border-color: #ffffff;
+        }
+        #album-gallery-root .nav-arrow.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.3);
+            color: #7a9fc0;
+            pointer-events: none;
+        }
+        #album-gallery-root .nav-arrow-left { left: -8px; }
+        #album-gallery-root .nav-arrow-right { right: -8px; }
+        #album-gallery-root .info-panel-col {
+            flex: 4;
+            min-width: 280px;
+            background: #ffffff;
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            padding: 40px 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 40px rgba(60, 120, 200, 0.04);
+            height: 100%;
+            min-height: 420px;
+            max-height: 100%;
+        }
+        #album-gallery-root .panel-content {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: opacity 0.25s ease;
+            opacity: 1;
+            height: 100%;
+            justify-content: center;
+        }
+        #album-gallery-root .panel-content.fade-out {
+            opacity: 0;
+        }
+        #album-gallery-root .panel-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: #0a2647;
+            letter-spacing: 1.5px;
+            line-height: 1.2;
+            margin-top: 0;
+        }
+        #album-gallery-root .panel-meta {
+            font-size: 16px;
+            color: #4a7a9a;
+            letter-spacing: 0.3px;
+            border-left: 3px solid rgba(59, 130, 246, 0.15);
+            padding-left: 16px;
+            font-weight: 400;
+        }
+        #album-gallery-root .panel-desc {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #1e3a5f;
+            margin: 8px 0 12px 0;
+            font-weight: 300;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+            flex: 1;
+        }
+        #album-gallery-root .panel-desc::-webkit-scrollbar {
+            width: 4px;
+        }
+        #album-gallery-root .panel-desc::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.12);
+            border-radius: 8px;
+        }
+        #album-gallery-root .play-btn {
+            margin-top: 8px;
+            background: rgba(59, 130, 246, 0.04);
+            border: 1px solid rgba(59, 130, 246, 0.10);
+            color: #1a4f8a;
+            padding: 16px 28px;
+            border-radius: 60px;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
+            box-shadow: 0 4px 10px rgba(40, 100, 200, 0.02);
+            backdrop-filter: blur(4px);
+            width: fit-content;
+            min-width: 180px;
+        }
+        #album-gallery-root .play-btn i {
+            font-size: 18px;
+            color: #3b82f6;
+        }
+        #album-gallery-root .play-btn:hover {
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(40, 100, 200, 0.08);
+            border-color: rgba(59, 130, 246, 0.15);
+        }
+        #album-gallery-root .video-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(235, 245, 255, 0.85);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #album-gallery-root .video-modal.active { display: flex; }
+        #album-gallery-root .modal-box {
+            background: #ffffff;
+            max-width: 760px;
+            width: 90%;
+            border-radius: 48px;
+            padding: 40px 32px 32px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 40px 80px rgba(40, 100, 200, 0.06);
+        }
+        #album-gallery-root .modal-box h3 {
+            color: #0a2647;
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+        #album-gallery-root .modal-box .fake-player {
+            background: #f0f7ff;
+            border-radius: 24px;
+            padding: 70px 20px;
+            color: #4a7a9a;
+            border: 1px solid rgba(59, 130, 246, 0.04);
+            margin-bottom: 28px;
+        }
+        #album-gallery-root .modal-close {
+            background: rgba(59, 130, 246, 0.02);
+            border: none;
+            color: #1a4f8a;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid rgba(59, 130, 246, 0.04);
+            transition: 0.2s;
+        }
+        #album-gallery-root .modal-close:hover {
+            background: rgba(59, 130, 246, 0.04);
+            color: #0a2647;
+            border-color: rgba(59, 130, 246, 0.08);
+        }
+
+        @media screen and (max-width: 1024px) {
+            #album-gallery-root .gallery-wrapper {
+                padding: 16px;
+                height: auto;
+                max-height: none;
+            }
+            #album-gallery-root .gallery-row {
+                flex-direction: column;
+                gap: 24px;
+            }
+            #album-gallery-root .coverflow-col {
+                height: 480px;
+                min-height: 320px;
+                flex: none;
+                width: 100%;
+            }
+            #album-gallery-root .info-panel-col {
+                flex: none;
+                width: 100%;
+                min-height: 260px;
+                padding: 28px 24px;
+                height: auto;
+            }
+            #album-gallery-root .panel-title { font-size: 28px; }
+            #album-gallery-root .panel-desc { font-size: 15px; max-height: 140px; }
+            #album-gallery-root .nav-arrow { width: 40px; height: 40px; font-size: 16px; }
+            #album-gallery-root .nav-arrow-left { left: 0px; }
+            #album-gallery-root .nav-arrow-right { right: 0px; }
+        }
+
+        @media screen and (max-width: 768px) {
+            #album-gallery-root { padding: 12px; }
+            #album-gallery-root .coverflow-col { height: 400px; }
+            #album-gallery-root .cover-card { width: 78px; height: 250px; }
+            #album-gallery-root .info-panel-col { padding: 20px 18px; min-height: 200px; }
+            #album-gallery-root .panel-title { font-size: 24px; }
+            #album-gallery-root .panel-desc { font-size: 14px; max-height: 100px; }
+            #album-gallery-root .play-btn { padding: 12px 20px; font-size: 15px; min-width: 140px; }
+        }
+
+        @media screen and (max-width: 480px) {
+            #album-gallery-root .cover-card { width: 60px; height: 190px; }
+            #album-gallery-root .coverflow-col { height: 320px; }
+            #album-gallery-root .panel-title { font-size: 20px; }
+        }
+
+        /* ===== 生活和你 · 白色主题影像画廊 (纯图片拼图) ===== */
+        #page-concert .gallery-container-life {
+            max-width: 1440px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px 36px;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+            margin: 0 auto;
+        }
+        #page-concert .gallery-row-life {
+            display: flex;
+            gap: 48px;
+            align-items: stretch;
+            min-height: 620px;
+        }
+        #page-concert .info-panel-life {
+            flex: 0 0 28%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 0 8px 0;
+            position: relative;
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            padding-right: 32px;
+        }
+        #page-concert .side-text-life {
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg);
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: rgba(0, 0, 0, 0.08);
+            text-transform: uppercase;
+            white-space: nowrap;
+            font-weight: 300;
+            font-family: 'Courier New', monospace;
+        }
+        #page-concert .title-section-life {
+            margin-bottom: 20px;
+        }
+        #page-concert .main-title-life {
+            font-size: 42px;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+        #page-concert .sub-title-life {
+            font-size: 16px;
+            font-weight: 300;
+            color: #1a1a1a;
+            letter-spacing: 3px;
+            -webkit-text-stroke: 0.5px rgba(26, 26, 26, 0.15);
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        #page-concert .divider-line-life {
+            width: 40px;
+            height: 2px;
+            background: #4c80c9;
+            margin-bottom: 14px;
+        }
+        #page-concert .time-meta-life {
+            font-size: 13px;
+            color: #888;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        #page-concert .slogan-text-life {
+            font-size: 14px;
+            color: #666;
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+        }
+        #page-concert .content-area-life {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: opacity 0.35s ease;
+            opacity: 1;
+        }
+        #page-concert .content-area-life.fade-out {
+            opacity: 0;
+        }
+        #page-concert .desc-title-life {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        #page-concert .desc-body-life {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+            font-weight: 300;
+            max-width: 90%;
+            margin-bottom: 18px;
+        }
+        #page-concert .nav-controls-life {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        #page-concert .nav-btn-life {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #666;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #page-concert .nav-btn-life:hover:not(.disabled) {
+            background: rgba(0, 0, 0, 0.06);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #1a1a1a;
+        }
+        #page-concert .nav-btn-life.disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        #page-concert .info-list-life {
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding-top: 16px;
+            margin-top: 6px;
+        }
+        #page-concert .info-row-life {
+            display: flex;
+            gap: 16px;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #888;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        #page-concert .info-row-life .label {
+            color: #aaa;
+            min-width: 48px;
+        }
+        #page-concert .info-row-life .value {
+            color: #666;
+        }
+        #page-concert .film-strip-life {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            padding: 4px 0;
+            min-height: 500px;
+            max-height: 780px;
+        }
+        #page-concert .film-track-life {
+            display: flex;
+            transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+            will-change: transform;
+            height: 100%;
+            gap: 0;
+        }
+        /* ---- 拼图网格：使用 flex 布局模拟不规则拼图 ---- */
+        #page-concert .film-page-life {
+            flex: 0 0 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-right: 4px;
+            height: 100%;
+            align-content: flex-start;
+            overflow-y: auto;
+        }
+        #page-concert .film-page-life::-webkit-scrollbar {
+            width: 4px;
+        }
+        #page-concert .film-page-life::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+        #page-concert .film-page-life::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* 卡片基础：所有图片卡片不重叠，用不同宽高比形成拼图感 */
+        #page-concert .film-card-life {
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f0ede8;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            flex-shrink: 0;
+        }
+        #page-concert .film-card-life:hover {
+            border-color: rgba(0, 0, 0, 0.15);
+            filter: brightness(0.96);
+            transform: scale(1.01);
+            z-index: 2;
+        }
+        #page-concert .film-card-life img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        #page-concert .film-card-life .card-index-life {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            font-size: 11px;
+            color: rgba(0, 0, 0, 0.3);
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 8px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 各种尺寸 (宽度基于父容器宽度自动计算，通过 flex-grow 和 basis 控制) */
+        #page-concert .film-card-life.small { 
+            flex: 0 0 calc(25% - 10px); 
+            aspect-ratio: 3 / 2; 
+        }
+        #page-concert .film-card-life.medium { 
+            flex: 0 0 calc(33.333% - 10px); 
+            aspect-ratio: 16 / 10; 
+        }
+        #page-concert .film-card-life.wide { 
+            flex: 0 0 calc(50% - 10px); 
+            aspect-ratio: 16 / 6; 
+        }
+        #page-concert .film-card-life.tall { 
+            flex: 0 0 calc(25% - 10px); 
+            aspect-ratio: 4 / 6; 
+        }
+        #page-concert .film-card-life.square { 
+            flex: 0 0 calc(33.333% - 10px); 
+            aspect-ratio: 1 / 1; 
+        }
+        #page-concert .film-card-life.large { 
+            flex: 0 0 calc(50% - 10px); 
+            aspect-ratio: 16 / 8; 
+        }
+        #page-concert .film-card-life.portrait { 
+            flex: 0 0 calc(25% - 10px); 
+            aspect-ratio: 2 / 3; 
+        }
+        #page-concert .film-card-life.wide-tall { 
+            flex: 0 0 calc(50% - 10px); 
+            aspect-ratio: 16 / 5; 
+        }
+        #page-concert .film-card-life.compact { 
+            flex: 0 0 calc(33.333% - 10px); 
+            aspect-ratio: 4 / 3; 
+        }
+        /* 额外增加一些不规则尺寸，丰富拼图 */
+        #page-concert .film-card-life.panorama { 
+            flex: 0 0 calc(66.666% - 10px); 
+            aspect-ratio: 21 / 7; 
+        }
+        #page-concert .film-card-life.stamp { 
+            flex: 0 0 calc(16.666% - 10px); 
+            aspect-ratio: 1 / 1; 
+        }
+
+        /* 视频弹窗（保留，但实际改为图片浏览，这里保留以备后续扩展） */
+        #page-concert .video-modal-life {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 40px;
+        }
+        #page-concert .video-modal-life.active {
+            display: flex;
+        }
+        #page-concert .modal-box-life {
+            width: min(90%, 900px);
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+        #page-concert .modal-box-life .modal-close-life {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 28px;
+            color: #888;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        #page-concert .modal-box-life .modal-close-life:hover {
+            color: #1a1a1a;
+        }
+        #page-concert .modal-box-life .video-wrapper-life {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #f5f3f0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #page-concert .modal-box-life .video-wrapper-life img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        #page-concert .modal-box-life .modal-title-life {
+            color: #1a1a1a;
+            font-size: 18px;
+            margin-top: 16px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        #page-concert .corner-text-life {
+            position: fixed;
+            font-size: 10px;
+            color: rgba(0, 0, 0, 0.06);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #page-concert .corner-tl-life { top: 16px; left: 24px; }
+        #page-concert .corner-tr-life { top: 16px; right: 24px; }
+        #page-concert .corner-bl-life { bottom: 16px; left: 24px; }
+        #page-concert .corner-br-life { bottom: 16px; right: 24px; }
+
+        @media screen and (max-width: 1024px) {
+            #page-concert .gallery-row-life { gap: 28px; }
+            #page-concert .main-title-life { font-size: 32px; }
+            #page-concert .info-panel-life { padding-right: 20px; }
+            #page-concert .film-page-life { gap: 8px; }
+            #page-concert .film-card-life.small { flex: 0 0 calc(33.333% - 8px); }
+            #page-concert .film-card-life.medium { flex: 0 0 calc(50% - 8px); }
+            #page-concert .film-card-life.wide { flex: 0 0 calc(66.666% - 8px); }
+            #page-concert .film-card-life.tall { flex: 0 0 calc(33.333% - 8px); }
+            #page-concert .film-card-life.square { flex: 0 0 calc(33.333% - 8px); }
+            #page-concert .film-card-life.large { flex: 0 0 calc(50% - 8px); }
+            #page-concert .film-card-life.portrait { flex: 0 0 calc(33.333% - 8px); }
+            #page-concert .film-card-life.wide-tall { flex: 0 0 calc(50% - 8px); }
+            #page-concert .film-card-life.compact { flex: 0 0 calc(33.333% - 8px); }
+            #page-concert .film-card-life.panorama { flex: 0 0 calc(66.666% - 8px); }
+            #page-concert .film-card-life.stamp { flex: 0 0 calc(25% - 8px); }
+        }
+
+        @media screen and (max-width: 768px) {
+            #page-concert .gallery-container-life { padding: 16px; }
+            #page-concert .gallery-row-life {
+                flex-direction: column;
+                gap: 32px;
+            }
+            #page-concert .info-panel-life {
+                flex: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+                padding-right: 0;
+                padding-bottom: 24px;
+                min-height: auto;
+            }
+            #page-concert .side-text-life { display: none; }
+            #page-concert .main-title-life { font-size: 28px; }
+            #page-concert .desc-body-life { max-width: 100%; }
+            #page-concert .film-strip-life {
+                min-height: 400px;
+                max-height: 600px;
+                width: 100%;
+            }
+            #page-concert .film-page-life { gap: 6px; }
+            #page-concert .film-card-life.small { flex: 0 0 calc(50% - 6px); aspect-ratio: 3/2; }
+            #page-concert .film-card-life.medium { flex: 0 0 calc(50% - 6px); aspect-ratio: 16/10; }
+            #page-concert .film-card-life.wide { flex: 0 0 calc(100% - 6px); aspect-ratio: 16/6; }
+            #page-concert .film-card-life.tall { flex: 0 0 calc(50% - 6px); aspect-ratio: 4/6; }
+            #page-concert .film-card-life.square { flex: 0 0 calc(50% - 6px); aspect-ratio: 1/1; }
+            #page-concert .film-card-life.large { flex: 0 0 calc(100% - 6px); aspect-ratio: 16/8; }
+            #page-concert .film-card-life.portrait { flex: 0 0 calc(50% - 6px); aspect-ratio: 2/3; }
+            #page-concert .film-card-life.wide-tall { flex: 0 0 calc(100% - 6px); aspect-ratio: 16/5; }
+            #page-concert .film-card-life.compact { flex: 0 0 calc(50% - 6px); aspect-ratio: 4/3; }
+            #page-concert .film-card-life.panorama { flex: 0 0 calc(100% - 6px); aspect-ratio: 21/7; }
+            #page-concert .film-card-life.stamp { flex: 0 0 calc(33.333% - 6px); aspect-ratio: 1/1; }
+            #page-concert .nav-controls-life {
+                justify-content: center;
+            }
+            #page-concert .corner-text-life { display: none; }
+        }
+
+        @media screen and (max-width: 480px) {
+            #page-concert .main-title-life { font-size: 24px; }
+            #page-concert .sub-title-life { font-size: 13px; }
+            #page-concert .film-strip-life { min-height: 320px; max-height: 480px; }
+            #page-concert .modal-box-life { padding: 16px; }
+            #page-concert .film-page-life { gap: 4px; }
+            #page-concert .film-card-life.small { flex: 0 0 calc(50% - 4px); aspect-ratio: 3/2; }
+            #page-concert .film-card-life.medium { flex: 0 0 calc(50% - 4px); aspect-ratio: 16/10; }
+            #page-concert .film-card-life.wide { flex: 0 0 calc(100% - 4px); aspect-ratio: 16/6; }
+            #page-concert .film-card-life.tall { flex: 0 0 calc(50% - 4px); aspect-ratio: 4/6; }
+            #page-concert .film-card-life.square { flex: 0 0 calc(50% - 4px); aspect-ratio: 1/1; }
+            #page-concert .film-card-life.large { flex: 0 0 calc(100% - 4px); aspect-ratio: 16/8; }
+            #page-concert .film-card-life.portrait { flex: 0 0 calc(50% - 4px); aspect-ratio: 2/3; }
+            #page-concert .film-card-life.wide-tall { flex: 0 0 calc(100% - 4px); aspect-ratio: 16/5; }
+            #page-concert .film-card-life.compact { flex: 0 0 calc(50% - 4px); aspect-ratio: 4/3; }
+            #page-concert .film-card-life.panorama { flex: 0 0 calc(100% - 4px); aspect-ratio: 21/7; }
+            #page-concert .film-card-life.stamp { flex: 0 0 calc(33.333% - 4px); aspect-ratio: 1/1; }
+        }
+
+        /* ===== 十二周年 · 长图文专栏样式（新增，仅限 #page-fan） ===== */
+        #page-fan {
+            background: #f7faff;
+            padding: 0;
+            margin: 0;
+        }
+        .fan-hero {
+            width: 100vw;
+            height: 420px;
+            position: relative;
+            overflow: hidden;
+            background: #d9e2ef;
+        }
+        .fan-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .fan-hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 55%;
+            background: linear-gradient(to top, rgba(0,0,0,0.18) 0%, rgba(247,250,255,0) 100%);
+            pointer-events: none;
+        }
+        .fan-hero-title {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        .fan-hero-title .main-title {
+            font-size: 42px;
+            font-weight: 400;
+            letter-spacing: 6px;
+            margin-bottom: 4px;
+            font-family: 'SimSun', '宋体', serif;
+        }
+        .fan-hero-title .en-sub {
+            font-size: 20px;
+            letter-spacing: 3px;
+            font-weight: 300;
+            opacity: 0.9;
+            font-family: 'Times New Roman', serif;
+            color: #f0f4fe;
+            margin-bottom: 6px;
+        }
+        .fan-hero-title .sub-desc {
+            font-size: 15px;
+            letter-spacing: 2px;
+            opacity: 0.85;
+            font-weight: 300;
+        }
+        .fan-container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        .fan-intro {
+            padding: 48px 0 32px 0;
+            text-align: center;
+        }
+        .fan-intro-text {
+            font-size: 17px;
+            color: #555;
+            letter-spacing: 0.6px;
+            line-height: 2;
+            max-width: 740px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        .fan-intro-text p {
+            margin-bottom: 0.4rem;
+        }
+        .fan-body-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #222;
+            margin-bottom: 1.8rem;
+            text-align: justify;
+        }
+        .fan-body-text p {
+            margin-bottom: 1.2rem;
+            text-indent: 2em;
+        }
+        .fan-body-text p:last-of-type {
+            margin-bottom: 0;
+        }
+        .fan-split {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            margin: 2.8rem 0 2.8rem 0;
+        }
+        .fan-split-text {
+            flex: 1 1 60%;
+        }
+        .fan-split-image {
+            flex: 0 0 32%;
+            max-width: 280px;
+        }
+        .fan-split-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .fan-split-image img:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        }
+        .fan-quote {
+            margin: 3.2rem 0 3.2rem 0;
+            padding: 2rem 1.8rem;
+            border-left: 1px solid #dce4f0;
+            border-right: 1px solid #dce4f0;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 6px;
+            text-align: center;
+        }
+        .fan-quote p {
+            font-size: 19px;
+            line-height: 2;
+            color: #222;
+            letter-spacing: 1px;
+            font-weight: 400;
+            margin: 0;
+        }
+        .fan-quote p + p {
+            margin-top: 0.2rem;
+        }
+        .fan-inline-img {
+            margin: 2.4rem 0 2.4rem 0;
+        }
+        .fan-inline-img img {
+            width: 100%;
+            border-radius: 6px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .fan-inline-img img:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+        }
+        .fan-image-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+            text-align: right;
+            letter-spacing: 0.5px;
+            padding-right: 6px;
+            border-bottom: 1px dotted #e6ecf5;
+            padding-bottom: 12px;
+        }
+        .fan-divider-line {
+            width: 80px;
+            height: 1px;
+            background: #d0d9e6;
+            margin: 3.2rem auto;
+        }
+        .fan-divider-symbol {
+            text-align: center;
+            color: #1a3463;
+            font-size: 18px;
+            letter-spacing: 12px;
+            margin: 3rem 0;
+            opacity: 0.5;
+            font-weight: 300;
+        }
+        .fan-ending {
+            margin: 3.6rem 0 2.4rem 0;
+            text-align: right;
+            padding-top: 0.8rem;
+            border-top: 1px solid #eaeef6;
+        }
+        .fan-ending-text {
+            font-size: 17px;
+            color: #222;
+            line-height: 2;
+            max-width: 680px;
+            margin-left: auto;
+            text-align: justify;
+            margin-bottom: 1.2rem;
+        }
+        .fan-ending-signature {
+            font-size: 18px;
+            color: #1a3463;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+        .fan-ending-image {
+            margin-top: 1.6rem;
+            max-width: 240px;
+            margin-left: auto;
+        }
+        .fan-ending-image img {
+            width: 100%;
+            border-radius: 6px;
+            display: block;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+        }
+        .fan-ending-image img:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        }
+        @media (max-width: 768px) {
+            .fan-hero { height: 260px; }
+            .fan-hero-title .main-title { font-size: 32px; letter-spacing: 4px; }
+            .fan-hero-title .en-sub { font-size: 17px; }
+            .fan-hero-title .sub-desc { font-size: 13px; }
+            .fan-container { padding: 0 20px; }
+            .fan-intro { padding: 32px 0 24px; }
+            .fan-split { flex-direction: column; gap: 18px; }
+            .fan-split-image { flex: 0 0 auto; max-width: 100%; width: 100%; }
+            .fan-split-text { flex: 1 1 auto; }
+            .fan-quote { padding: 1.2rem 1rem; margin: 2.4rem 0; }
+            .fan-quote p { font-size: 18px; }
+            .fan-body-text { font-size: 16px; }
+            .fan-ending-text { font-size: 16px; }
+            .fan-ending-image { max-width: 160px; }
+        }
+        @media (max-width: 480px) {
+            .fan-hero-title .main-title { font-size: 28px; }
+            .fan-hero-title .en-sub { font-size: 15px; }
+            .fan-hero-title .sub-desc { font-size: 12px; }
+            .fan-container { padding: 0 16px; }
+            .fan-quote p { font-size: 16px; }
+        }
+        /* ===== 账号系统样式 (仅新增部分，不改动原有) ===== */
+        .auth-area {
+            background: #ffffff;
+            padding: 20px 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(26, 52, 99, 0.08);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px 12px;
+        }
+        .auth-status {
+            font-size: 16px;
+            color: #223a66;
+        }
+        .auth-status strong {
+            color: #1a3463;
+        }
+        .auth-btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .auth-btn {
+            padding: 8px 20px;
+            background: #e9f2fb;
+            border: 1px solid #c6d7f0;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a3463;
+            font-family: 'SimSun', '宋体', serif;
+        }
+        .auth-btn:hover {
+            background: #d4e2f5;
+            border-color: #1a3463;
+        }
+        .auth-btn.primary {
+            background: #1a3463;
+            color: #fff;
+            border-color: #1a3463;
+        }
+        .auth-btn.primary:hover {
+            background: #152a4f;
+        }
+        .auth-btn.danger {
+            background: rgba(220, 80, 80, 0.08);
+            border-color: rgba(220, 80, 80, 0.2);
+            color: #b34a4a;
+        }
+        .auth-btn.danger:hover {
+            background: rgba(220, 80, 80, 0.15);
+        }
+        .auth-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .auth-modal.active {
+            display: flex;
+        }
+        .auth-modal-box {
+            background: #fff;
+            padding: 32px 36px;
+            border-radius: 20px;
+            width: min(92%, 420px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .auth-modal-box h3 {
+            font-size: 24px;
+            color: #1a3463;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .auth-modal-box .msg-input-group {
+            margin-bottom: 16px;
+        }
+        .auth-modal-box .msg-input-group label {
+            font-size: 15px;
+        }
+        .auth-modal-box .auth-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1a3463;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+        }
+        .auth-modal-box .auth-submit-btn:hover {
+            background: #152a4f;
+        }
+        .auth-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 26px;
+            color: #888;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .auth-modal-close:hover {
+            color: #1a1a1a;
+        }
+        .auth-error {
+            color: #b34a4a;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+        .auth-error.show {
+            display: block;
+        }
+        .auth-success {
+            color: #2a7a4a;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+        .auth-success.show {
+            display: block;
+        }
+        .msg-form-area .hidden {
+            display: none !important;
+        }
+        @media (max-width: 600px) {
+            .auth-area {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .auth-btn-group {
+                justify-content: center;
+            }
+            .auth-modal-box {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="nav-active" data-target="page-home">首页</a>
+            <a href="#" data-target="page-intro">我的星星</a>
+            <a href="#" data-target="page-member">反深代词</a>
+            <a href="#" data-target="page-album">相识相遇</a>
+            <a href="#" data-target="page-concert">生活和你</a>
+            <a href="#" data-target="page-fan">十二周年</a>
+            <a href="#" data-target="page-message">留言板</a>
+        </nav>
+    </header>
+
+    <!-- 首页 -->
+    <div class="page-box active" id="page-home">
+        <section class="banner">
+            <button class="banner-btn banner-prev">&lt;</button>
+            <button class="banner-btn banner-next">&gt;</button>
+            <div class="banner-wrap">
+                <img class="banner-img" src="img/bg1.jpg" alt="轮播图1" style="object-position: center 80%;">
+                <img class="banner-img" src="img/bg2.jpg" alt="轮播图2" style="object-position: center 5%;">
+                <img class="banner-img" src="img/bg3.jpg" alt="轮播图3" style="object-position: center 90%;">
+                <img class="banner-img" src="img/bg4.jpg" alt="轮播图4" style="object-position: center 5%;">
+                <img class="banner-img" src="img/bg5.jpg" alt="轮播图5" style="object-position: center 50%;">
+                <img class="banner-img" src="img/bg1.jpg" alt="轮播图复制" style="object-position: center 80%;">
+            </div>
+            <div class="banner-dots"></div>
+        </section>
+
+        <section class="intro-wrap">
+            <h2 class="intro-title" style="font-family: Microsoft Yahei, sans-serif;">加一和她的星星</h2>
+            <p class="intro-sub">暨庆祝周深725出道十二周年快乐</p>
+            <p class="intro-desc">
+                在2014年的7月5号，一个小小的男孩走上了舞台，拿起属于他的话筒，获得了属于他的星光<br>
+                在2022年的7月5号，一个小小的女孩在电视机前，认识了干净真诚的少年，看见了她的星星<br>
+                在2026年的7月5号，出道十二周年的周深和喜欢了他四年的加一，会一直记得
+            </p>
+            <div class="img-list">
+                <div class="img-item"><img src="img/pic1.jpg" alt="图1"></div>
+                <div class="img-item"><img src="img/pic2.jpg" alt="图2"></div>
+                <div class="img-item"><img src="img/pic3.jpg" alt="图3"></div>
+                <div class="img-item"><img src="img/pic4.jpg" alt="图4"></div>
+                <div class="img-item"><img src="img/pic5.jpg" alt="图5"></div>
+                <div class="img-item"><img src="img/pic6.jpg" alt="图6"></div>
+            </div>
+        </section>
+
+        <footer>
+            <p>版权申明：本网站为纪念和热爱所创作，网站版权为个人所属</p>
+            <p>图片版权不属本人，部分素材来源于网络</p>
+            <p>若有侵权问题或其他问题，在此表示抱歉，您可以通过邮箱“1614734727@qq.com”向我联系</p>
+        </footer>
+    </div>
+
+    <!-- 我的星星页面 -->
+    <div class="page-box" id="page-intro">
+        <div class="intro-wrap-stack">
+            <div class="bg-block white" style="top:90px;left:10%;width:1100px;height:100px;z-index:0;"></div>
+            <div class="bg-block" style="top:130px;left:11%;width:1100px;height:120px;z-index:2;"></div>
+            <div class="bg-block white" style="top:170px;left:9%;width:1100px;height:100px;z-index:4;"></div>
+            <div class="bg-block white" style="top:210px;left:10%;width:1100px;height:100px;z-index:6;"></div>
+            <div class="bg-block white" style="top:250px;left:10%;width:1100px;height:100px;z-index:8;"></div>
+            <div class="bg-block white" style="top:290px;left:11%;width:1100px;height:120px;z-index:10;"></div>
+            <div class="bg-block white" style="top:330px; left:9%;width:1100px;height:100px;z-index:12;"></div>
+            <div class="bg-block white" style="top:370px;left:10%;width:1100px;height:100px;z-index:14;"></div>
+            <div class="bg-block" style="top:415px;left:8%;width:1100px;height:100px;z-index:18;"></div>
+            <div class="bg-block white" style="top:480px;left:11%;width:1100px;height:100px;z-index:20;"></div>
+            <div class="bg-block white" style="top:530px;left:10%;width:1100px;height:100px;z-index:22;"></div>
+
+            <div class="stack-item dark" data-center="1" style="top:70px;left:20%;width:200px;z-index:1;" data-text="中文名：周深
+外文名：Charlie Zhou
+出生日期：1992年9月29日
+出道日：2014年7月25日
+出生地：湖南省邵阳市
+成长地：贵州省贵阳市
+星座：天秤座
+毕业院校：利沃夫国立立谢科音乐科学院
+经纪公司：周深工作室">个人档案</div>
+            <div class="stack-item" style="top:110px;left:30%;width:200px;z-index:3;" data-text="　　周深出生在湖南邵阳一个普通务工家庭，小时候和姐姐一起留守，之后全家搬到贵阳生活。小学时他嗓音清亮，担任校合唱团领唱，还多次带队拿下市里合唱比赛奖项，声乐天赋早早显露。
+　　上初中恰逢变声期，他的声音依旧是干净的童声，和别的男生差别很大，常常被同学嘲讽、排挤。承受巨大心理压力的他整整三年不敢在众人面前唱歌，十分自卑。
+　　到了高中，在大家的鼓励下，他报名校园歌唱比赛一举夺冠，慢慢走出心理阴影，接纳了自己与众不同的嗓音。
+　  高考后周深远赴乌克兰读书，一开始选择学医，可语言不通加上学业压力巨大，最终下定决心追逐音乐梦想，转学进入利沃夫国立立谢科音乐科学院学习美声，打下扎实的演唱功底。">成长历程</div>
+            <div class="stack-item" style="top:150px;left:50%;width:200px;z-index:5;" data-text="　　2010 年，他以网名 “卡布叻” 在网络平台直播唱歌，空灵嗓音收获第一批听众，完成音乐道路最初的积累。
+    　　2014 年登上《中国好声音第三季》，一曲《欢颜》打动导师正式走入大众视野。2016 年动画电影《大鱼海棠》印象曲《大鱼》横空出世，空灵吟唱传遍大街小巷，成为一生标志性作品。
+    　　此后陆续登陆《声入人心》《歌手》等重磅音乐综艺，多变曲风、稳定唱功持续收获好评。2024 年第二张个人专辑《反深代词》发行，闯入 IFPI 全球畅销专辑榜单；2025 年开启世界巡回演唱会，奔赴多个海外城市，一步步站上国际化舞台。">歌手之路</div>
+            <div class="stack-item" style="top:190px;left:40%;width:200px;z-index:7;" data-text="周深嗓音空灵纯净，音域广阔，高音通透、低音温润。古风、流行、美声、戏腔、影视 OST、民族歌曲皆能自如演绎，曲风包容性极强。
+    《大鱼》：家喻户晓的标志性曲目，悠远空灵，无数人认识周深的起点；
+    《灯火里的中国》：主旋律经典作品，亮相 2021 央视春晚；
+    《花开忘忧》：温暖治愈，2023 央视春晚独唱曲目；
+    《人是》：科幻电影《流浪地球 2》主题曲；
+    《光亮》：融合戏腔与流行，纪录片《紫禁城》主题曲。">代表作品</div>
+            <div class="stack-item" style="top:230px;left:30%;width:200px;z-index:9;" data-text="《深的深》｜2017
+首张正式录音室专辑，高晓松监制，奠定细腻、诗意的音乐基调。
+《反深代词》｜2024
+筹备多年重磅专辑，销量突破200万张，冲进IFPI全球榜单，实现华语音乐崭新的国际突破。">个人专辑</div>
+            <div class="stack-item" style="top:270px;left:18%;width:200px;z-index:11;" data-text="　　连续多年登上央视春晚舞台，多次参与国家级大型文艺晚会；
+　　2024远赴纽约联合国总部进行演讲，并现场演唱公益歌曲《和平颂》，在国际舞台传递东方声音。">重磅演出</div>
+            <div class="stack-item" style="top:310px;left:25%;width:200px;z-index:13;" data-text="　　担任联合国COP15生物多样性大会公益大使，演唱主题曲《和光同春》，助力生态保护宣传；
+　　携手最高人民检察院推出未成年人检察概念曲《奉时光予你》，用音乐守护青少年；
+　　持续关注乡村教育、野生动物保护、大病救助等各类公益项目，践行文艺从业者的温度与担当。">公益行动</div>
+            <div class="stack-item dark" style="top:355px;left:60%;width:200px;z-index:15;" data-text="音乐奖项
+　　蝉联两届TMEA年度最佳内地男歌手；第30届东方风云榜最佳男歌手；专辑《反深代词》登上2024 IFPI全球畅销专辑第11位，榜单唯一华语歌手。
+综合荣誉
+　　微博之夜年度内地歌手，收获文娱行业广泛认可。
+">荣誉奖项</div>
+            <div class="stack-item" style="top:430px;left:70%;width:200px;z-index:19;" data-text="　　在审美同质化的华语乐坛，周深依靠极具辨识度的声线、全能扎实的唱功走出独属于自己的道路。
+　　他温柔清醒、共情力充沛，坚持真诚对待每一首作品、每一场舞台。同时积极参与文化传播、公益宣传，用自身成长经历鼓励无数陷入自卑与迷茫的普通人，展现新时代文艺工作者的责任与力量。">个人特质</div>
+            <div class="stack-item" style="top:465px;left:40%;width:200px;z-index:21;" data-text="　　从早年坐在小小的直播间，到如今万人演唱会座无虚席，周深与粉丝始终是彼此支撑的关系。
+　　他常常在舞台诉说，是听众长久的喜爱让曾经畏惧发声的少年敢于持续歌唱；粉丝也在他的歌声与人生故事里获得治愈与力量。
+　　没有激烈的隔阂与对立，更多是安静长久的陪伴，大家共同约定，在各自的人生道路认真生活，隔着人海，一同奔赴更远的星光。
+">双向奔赴</div>
+
+            <div class="bg-block-straight white" style="top:168px;left:30.28%;width:192px;height:10px;z-index:4;"></div>
+            <div class="bg-block-straight white" style="top:208px;left:50.28%;width:192px;height:10px;z-index:6;"></div>
+            <div class="bg-block-straight white" style="top:248px;left:40.28%;width:192px;height:10px;z-index:8;"></div>
+            <div class="bg-block-straight white" style="top:288px;left:30.28%;width:192px;height:10px;z-index:10;"></div>
+            <div class="bg-block-straight white" style="top:328px;left:18.28%;width:192px;height:10px;z-index:12;"></div>
+            <div class="bg-block-straight white" style="top:368px;left:25.28%;width:192px;height:10px;z-index:14;"></div>
+            <div class="bg-block-straight white" style="top:478px;left:70.28%;width:192px;height:10px;z-index:20;"></div>
+            <div class="bg-block-straight white" style="top:527px;left:40.28%;width:192px;height:10px;z-index:22;"></div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-left-wrap">
+                        <div class="timeline-label">2014</div>
+                    </div>
+                    <div class="timeline-right">
+                        <div class="timeline-img" style="background-image:url('img/pic7.jpg');" data-src="img/pic7.jpg"></div>
+                        <div class="timeline-desc">
+                            <h3>从一首《欢颜》开始</h3>
+                            <div class="tag-group">
+                                <span class="tag green">好声音</span>
+                                <span class="tag blue">《欢颜》</span>
+                                <span class="tag orange">正式出道</span>
+                            </div>
+                            <p>周深登上《中国好声音第三季》的舞台，一曲《欢颜》让观众记住这个独特干净的嗓音，正式开启属于自己的音乐道路。尽管比赛止步，但他的声音已经留在了听众的记忆里。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-left-wrap">
+                        <div class="timeline-label">2016</div>
+                    </div>
+                    <div class="timeline-right">
+                        <div class="timeline-img" style="background-image:url('img/pic8.jpg');" data-src="img/pic8.jpg"></div>
+                        <div class="timeline-desc">
+                            <h3>《大鱼》和你被更多人听到</h3>
+                            <div class="tag-group">
+                                <span class="tag green">大鱼海棠</span>
+                                <span class="tag blue">出圈代表作</span>
+                                <span class="tag orange">国民金曲</span>
+                            </div>
+                            <p>《大鱼》发布，这首歌成为周深出圈代表作，无数人因这一曲走进他的音乐世界，而我们无论多少次分离，都会倒流回最初的相遇。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-left-wrap">
+                        <div class="timeline-label">2024</div>
+                    </div>
+                    <div class="timeline-right">
+                        <div class="timeline-img" style="background-image:url('img/pic9.jpg');" data-src="img/pic9.jpg"></div>
+                        <div class="timeline-desc">
+                            <h3>《反深代词》神专强势来袭</h3>
+                            <div class="tag-group">
+                                <span class="tag green">原创专辑</span>
+                                <span class="tag blue">IFPI榜单</span>
+                                <span class="tag orange">世界巡演</span>
+                            </div>
+                            <p>专辑《反深代词》正式上线，多首参与作词作曲、多元曲风大胆尝试，销量口碑双双收获好评，并且登上IFPI全球畅销专辑榜单，让华语声音走向更广的舞台。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="img-modal" id="imgModal">
+            <span class="img-close">×</span>
+            <img id="modalPhoto" src="" alt="大图">
+        </div>
+        <div class="pop-mask" id="popMask">
+            <div class="pop-box">
+                <span class="pop-close" id="popClose">×</span>
+                <p class="pop-text" id="popContent"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反深代词页面 -->
+    <div class="page-box" id="page-member">
+        <div class="coverflow-container">
+            <div class="coverflow-wrap">
+                <button class="cover-arrow cover-prev">&lt;</button>
+                <div class="cover-list">
+                    <div class="cover-item"><img src="img/fsdc1.jpg" alt="封面1"></div>
+                    <div class="cover-item"><img src="img/fsdc2.jpg" alt="封面2"></div>
+                    <div class="cover-item"><img src="img/fsdc3.jpg" alt="封面3"></div>
+                    <div class="cover-item"><img src="img/fsdc4.jpg" alt="封面4"></div>
+                    <div class="cover-item"><img src="img/fsdc5.jpg" alt="封面5"></div>
+                    <div class="cover-item"><img src="img/fsdc6.jpg" alt="封面6"></div>
+                    <div class="cover-item"><img src="img/fsdc7.jpg" alt="封面7"></div>
+                    <div class="cover-item"><img src="img/fsdc8.jpg" alt="封面8"></div>
+                    <div class="cover-item"><img src="img/fsdc9.jpg" alt="封面9"></div>
+                    <div class="cover-item"><img src="img/fsdc10.jpg" alt="封面10"></div>
+                    <div class="cover-item"><img src="img/fsdc11.jpg" alt="封面11"></div>
+                    <div class="cover-item"><img src="img/fsdc12.jpg" alt="封面12"></div>
+                </div>
+                <button class="cover-arrow cover-next">&gt;</button>
+            </div>
+            <div class="album-info-area">
+                <h2 class="album-title">专辑名称</h2>
+                <p class="album-author">周深</p>
+            </div>
+            <div class="track-list"></div>
+            <div class="album-intro-text" id="albumIntro">
+                <em>「反深代词」</em> 是周深2024年发行的第二张个人专辑，收录12首风格多元的原创作品。专辑以“自我对话”为核心，融合流行、电子、国风等元素，展现了他对音乐的深度探索与突破。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 相识相遇 · 独立封装（不污染其他板块） ===== -->
+    <div class="page-box" id="page-album">
+        <div id="album-gallery-root">
+            <div class="gallery-wrapper">
+                <div class="gallery-row">
+                    <div class="coverflow-col">
+                        <div class="coverflow-track">
+                            <div class="card-container" id="cardContainer"></div>
+                            <div class="nav-arrow nav-arrow-left" id="arrowLeft"><i class="fas fa-chevron-left"></i></div>
+                            <div class="nav-arrow nav-arrow-right" id="arrowRight"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                    </div>
+                    <div class="info-panel-col" id="infoPanel">
+                        <div class="panel-content" id="panelContent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="video-modal" id="videoModal">
+                <div class="modal-box">
+                    <h3><i class="fas fa-play-circle" style="color: #3b82f6; margin-right: 12px;"></i>视频播放</h3>
+                    <div class="fake-player" id="videoPlayerContainer">
+                        <i class="fas fa-film" style="font-size: 44px; opacity: 0.2; margin-bottom: 16px; display: block;"></i>
+                        <span style="font-weight: 300; letter-spacing: 1px; color: #2a6bb0;">「反深代词」· 线上首唱</span>
+                    </div>
+                    <button class="modal-close" id="closeModalBtn"><i class="fas fa-times" style="margin-right: 8px;"></i> 关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 生活和你 · 白色主题影像画廊（纯图片拼图） ===== -->
+    <div class="page-box" id="page-concert">
+        <div class="gallery-container-life">
+            <div class="corner-text-life corner-tl-life">LIFE · MOMENTS</div>
+            <div class="corner-text-life corner-tr-life">FILM · 2026</div>
+            <div class="corner-text-life corner-bl-life">ZHOU SHEN · ARCHIVE</div>
+            <div class="corner-text-life corner-br-life">ANALOG · 纪实</div>
+
+            <div class="gallery-row-life">
+                <!-- 左侧信息栏 -->
+                <div class="info-panel-life">
+                    <span class="side-text-life">LIFE · WITH YOU</span>
+                    <div class="title-section-life">
+                        <h1 class="main-title-life" id="mainTitleLife">生活和你</h1>
+                        <div class="sub-title-life" id="subTitleLife">LIFE WITH YOU</div>
+                        <div class="divider-line-life"></div>
+                        <div class="time-meta-life" id="timeMetaLife">2024 — 2026 · 影像纪事</div>
+                        <div class="slogan-text-life" id="sloganTextLife">每一帧都是和你有关的时光</div>
+                    </div>
+                    <div class="content-area-life" id="contentAreaLife">
+                        <div class="desc-title-life" id="descTitleLife">篇章 · 初遇</div>
+                        <div class="desc-body-life" id="descBodyLife">从第一场演唱会开始，镜头记录下舞台上下每一个真实瞬间。那些灯光、歌声、微笑与泪水，拼凑成我们共同走过的路。</div>
+                    </div>
+                    <div class="nav-controls-life">
+                        <button class="nav-btn-life" id="prevBtnLife">◀</button>
+                        <button class="nav-btn-life" id="nextBtnLife">▶</button>
+                    </div>
+                    <div class="info-list-life" id="infoListLife">
+                        <div class="info-row-life"><span class="label">时间</span><span class="value" id="infoTimeLife">2024.07 — 2026.07</span></div>
+                        <div class="info-row-life"><span class="label">地点</span><span class="value" id="infoLocationLife">上海 · 北京 · 广州</span></div>
+                        <div class="info-row-life"><span class="label">分类</span><span class="value" id="infoCategoryLife">演唱会 · 舞台 · 纪实</span></div>
+                    </div>
+                </div>
+
+                <!-- 右侧影像区：拼图布局（纯图片） -->
+                <div class="film-strip-life">
+                    <div class="film-track-life" id="filmTrackLife">
+                        <!-- 由 JavaScript 动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图片查看弹窗（点击图片放大） -->
+        <div class="video-modal-life" id="videoModalLife">
+            <div class="modal-box-life">
+                <button class="modal-close-life" id="modalCloseLife">✕</button>
+                <div class="video-wrapper-life" id="videoWrapperLife">
+                    <img id="modalImageLife" src="" alt="大图">
+                </div>
+                <div class="modal-title-life" id="modalTitleLife">影像标题</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 十二周年 · 长图文专栏（放入 #page-fan） ===== -->
+    <div class="page-box" id="page-fan">
+        <!-- 1. 通栏全屏头图 -->
+        <div class="fan-hero">
+            <img src="img/12.jpg" alt="十二周年日常氛围" loading="lazy">
+            <div class="fan-hero-overlay"></div>
+            <div class="fan-hero-title">
+                <div class="main-title">十二周年</div>
+                <div class="en-sub">12TH DEBUT ANNIVERSARYY</div>
+                <div class="sub-desc">今年是我喜欢你的第四年</div>
+            </div>
+        </div>
+
+        <!-- 2. 开篇导语 -->
+        <div class="fan-container fan-intro">
+            <div class="fan-intro-text">
+                <p>出道十二周年快乐啊！！！我们的歌手周深！！！</p>
+                <p>十二周年了诶，其实真的蛮久了的了。也是我喜欢周深的第四年了。<br>其实…大部分写一些文字我更经常是写给周深，以第二人称视角给他写信<br>但是今天，我想和你们来聊一聊我的四年</p>
+            </div>
+        </div>
+
+        <!-- 3. 正文主体 -->
+        <div class="fan-container">
+            <!-- 版式① 标准正文 -->
+            <div class="fan-body-text">
+                <p>四年其实真的算不上太久，和很多出道的时候就喜欢他的人，出道之前直播的时候就喜欢他的人相比，我的喜欢也不长。我知道的，不能这样比较，但总是会忍不住</p>
+                <p>我有时候觉得我真的和周深太像了，我的朋友总是骂我，你为什么老是有一股愧疚感……我想说，爱就是常觉亏欠……【bushi</p>
+                <p>真的是因为我觉得我自己做不到什么能够帮上他，至少是没办法做的像别人那样多，我的能力很小，但我会在我的能力基础上用尽全力去爱他，愧疚就愧疚吧，欠着就欠一辈子吧</p>
+                <p>我只是觉得我的喜欢要够回应他为我们做的……【扯远了扯远了</p>
+            </div>
+
+            <!-- 分割符号 -->
+            <div class="fan-divider-symbol">✦ · ✧</div>
+
+            <!-- 版式② 左右分栏 -->
+            <div class="fan-split">
+                <div class="fan-split-text fan-body-text">
+                    <p>我的四年开始的很简单，一个综艺，几个舞台，一条微博，总得来讲是被那一个真心感动——真心最要紧了！！其实刚开始的时候真的没有现在爱的这么深，我的朋友在此之前也完全没有想到我是一个会追星的人，好吧，我自己也没有想到……但是就是真的发现，在每一首天籁的歌里，每一句深深说的话里，每一次深深的行动和表现里，我就觉得，哇，他真的真的是一个很好的人诶！</p>
+                    <p>能够选择自己的路并且走下去，能够在面对这么多谩骂过后还是一个纯真善良的人，甚至会因为怕自己让我们错过了人生的很多风景而哭泣……喂我真的说不完诶！</p>
+                    <p>我很难列举他在音乐上的成绩，因为列举不完</p>
+                    <p>也很难细数他的真心，因为心没办法写全</p>
+                    <p><br></p>
+                    <p>所以，在每一次见过他之后，我就问我自己</p>
+                    <p>你是不是更爱他一点了</p>
+                    <p>我说</p>
+                    <p>是的</p>
+                    <p>一定是的</p>
+                </div>
+                <div class="fan-split-image">
+                    <img src="img/3.jpg" alt="竖图·日常随拍" loading="lazy">
+                </div>
+            </div>
+
+            <!-- 分割线 -->
+            <div class="fan-divider-line"></div>
+
+            <!-- 版式③ 居中金句 -->
+            <div class="fan-quote">
+                <p>“绽放时的缤纷，凋零时的残破</p>
+                <p>爱有时不过就只求一个记得”</p>
+                <div class="fan-image-caption">《花开》</div>
+
+            </div>
+
+            <!-- 版式④ 横向插图 -->
+            <div class="fan-inline-img">
+                <img src="img/1.jpg" alt="傍晚时分的街道" loading="lazy">
+                <div class="fan-image-caption">当你奋力奔向我们，我们的心也近了</div>
+            </div>
+
+            <!-- 正文段落 -->
+            <div class="fan-body-text">
+                <p>23年那年是高二，我刚喜欢上他的时候，其实一切都刚刚好，在我毕业那年开了9.29hz的巡演，我突然就有了机会真的去见你</p>
+                <p>老天爷都在给我机会！</p>
+                <p>其实见面真的好难，抢票，路程，花销……其实最开始我的爸妈不同意，他们觉得不安全、没必要什么的，但是后来我妈妈就问我“如果你觉得这真的对你很重要，那你就去吧”</p>
+                <p>爸爸妈妈也很爱我</p>
+                <p>而这个被很多人爱着的加一就出发了</p>
+                <p>一次，两次，三次，以后还会有更多次……</p>
+            </div>
+
+            <!-- 版式② 左右分栏（第二次） -->
+            <div class="fan-split">
+                <div class="fan-split-text fan-body-text">
+                    <p>我特别喜欢在演唱会的两个环节</p>
+                    <p>一个是安可的时候，全场来自五湖四海的男女老少，无论什么年龄，什么工种，所有人齐声大喊着周深的名字</p>
+                    <p>“周深！……周深！……”</p>
+                    <p>有的人可能只是当这个环节是个过场</p>
+                    <p>但我真是很喜欢，因为我们喊的时候，在后台转场的周深也一定听的到，他会听见所有爱他的人喊着他的名字，有这么这么多人是为了他来的，有这么这么多人是来爱他的</p>
+                    <p>而原因就是</p>
+                    <p>他是周深</p>
+                    <p>周深经常说“我出现在你们生命里一句歌词，一段副歌，我就很幸福啦”“你会记得我吗”</p>
+                    <p>而在这个时候，我用尽全力喊着他的名字，告诉他，我记得</p>
+                </div>
+                <div class="fan-split-image">
+                    <img src="img/4.jpg" alt="竖图·书与光影" loading="lazy">
+                </div>
+            </div>
+
+            <!-- 正文段落 -->
+            <div class="fan-body-text">
+                <p>还有一个环节是快散场的时候，最后一首歌，他致谢，鞠躬，挥手，然后跑向各个区，跑向所有人。他会从舞台的一头跑向另一头，有时候他跑的真的很用力，想快一点再和所有人挥挥手，说声再见，有时候一边跑一边还有眼泪，因为我们都不想说再见</p>
+                <p>他跑向我们的时候，我会又一次意识到他就在我面前，他也爱着来爱他的人</p>
+                <p>因为这是他的演唱会，是他和我们见面的地方</p>
+                <p>有时候我会想起早期的时候很稚嫩青涩的周深，但有人说回到过去呢</p>
+                <p>不行！</p>
+                <p>我不希望他再来一次很艰难的时光，尽管他能再一次走向美好的未来</p>
+                <p>但小深就是要站在舞台上，在聚光灯下，在万人面前唱歌！！</p>
+                <p>周深就是要站在有光的舞台上</p>
+            </div>
+
+            <!-- 分割线 -->
+            <div class="fan-divider-line"></div>
+
+            <!-- 版式③ 第二个金句 -->
+            <div class="fan-quote">
+                <p>我以渺小爱你同行的旅程<br>我以短暂爱你不朽的旅程</p>
+                <div class="fan-image-caption">《我以渺小爱你》</div>
+
+            </div>
+
+            <!-- 正文段落 -->
+            <div class="fan-body-text">
+                 <p>人有时候总是有点感性</p>
+                 <p>而我比较严重，我经常因为各种事情掉眼泪，不管是幸福的还是悲伤的事情都很容易让我掉眼泪。</p>
+                 <p>记得哭的好惨的几次，抢到票可以去演唱会的时候，伦敦站取消的时候，虚构刚上线的时候，小深的vlog的时候，演唱会上唱花开的时候……</p>
+                 <p>我现在有时候看见周深很开心幸福的时候也会流泪</p>
+                 <p>一定是爱的，只是爱融进心脏里了，爱的时候总是免不了触动，无声，跳动</p>
+                 <p>但我们的底色一定是幸福的</p>
+                 <p>眼泪的前调可能有点酸苦，但后调会是甜的</p>
+                 <p><br></p>
+                 <p>有好多好多我想说的，小深做的什么什么事情，他拿过的什么什么奖，他生活里的什么什么故事……但我真的在写的时候，我什么都记不清了</p>
+                 <p>我只记得我要写我爱他</p>
+                 <p>爱真的好大的一个词</p>
+                 <p>在高中的时候我曾经和我的一个朋友说，在没有能力前不就要说爱。但我发现好像有点错了，爱总是先来的，只不过我会在爱的过程中找到我去爱他的能力</p>
+                 <p>一边爱他，一边找到了自己</p>
+            </div>
+
+            <!-- 分割符号 -->
+            <div class="fan-divider-symbol">✦ · ✧</div>
+
+            <!-- 正文段落 -->
+            <div class="fan-body-text">
+                 <p>今年是十二周年了，我其实想了很多为这次周年准备什么，画画，剪辑还是蛋糕……</p>
+                 <p>后来我决定制作这个网站</p>
+                 <p>十二周年是一轮了吧【周深说他的出道日是生米的生日，所以我们12岁了，刚好一轮哈哈哈哈哈哈】这么重要的日子我想值得纪念！！网站能放很久很久呢</p>
+                 <p>虽然这个网站做的真的很粗糙【特别鸣谢豆包和DeepSeek</p>
+                 <p>比起别人的，我的小小网站略微有些朴实，但是绝对是我的真心！！</p>
+                 <p>我也想把我的真心拿出来看看</p>
+                 <p>在下一个十二年的时候我还能再把这个网站拿出来看看，下一个十二年我还会在台下听周深唱歌！</p>
+            </div>
+
+            <!-- 版式④ 横向插图 -->
+            <div class="fan-inline-img">
+                <img src="img/2.jpg" alt="傍晚时分的街道" loading="lazy">
+                <div class="fan-image-caption">演唱会上闪闪发光的你</div>
+            </div>
+
+            <!-- 版式② 左右分栏（第三次） -->
+            <div class="fan-split">
+                <div class="fan-split-text fan-body-text">
+                    <p>很感谢我的家人们朋友们，有人经常说我很幸福，说我真的能爱到海枯石烂的感觉哈哈哈哈哈哈，我很感谢他们，我也很感谢每一个愿意听我说这些的人</p>
+                    <p>因为这都是我个人的感情，可能和一个不了解的人说对他们来说不是很在意【也许有些矫情？】</p>
+                    <p>但你愿意听，我就很开心了，谢谢你们</p>
+                    <p>包括在这个网站已经看到这里的你，谢谢你</p>
+                    <p><br></p>
+                    <p>我真的真的很喜欢周深</p>
+                    <p>无论怎么样，我会一直在，会一直记得周深</p>
+                    <p>所以小深，你不许再说自己“何德何能”了！！这么好的人就是值得啊！！！【还是变成第二人称了……</p>
+                    <p><br></p>
+                    <p>最后，这篇文章也许有点乱，牛头不对马嘴，就只是我个人的想法，想到什么就写了，看不懂的可以来问我，我很乐意和你聊</p>
+                    <p>如果你愿意，加一可以和你聊一个晚自习</p>
+                </div>
+                <div class="fan-split-image">
+                    <img src="img/5.jpg" alt="竖图·书与光影" loading="lazy">
+                </div>
+            </div>
+
+            <!-- 结尾收尾 -->
+            <div class="fan-ending">
+                <div class="fan-ending-text">
+                    <p>最后的最后</p>
+                    <p>谢谢每一个愿意停留片刻的你。</p>
+                    <p>再一次祝周深出道十二周年快乐！！！</p>                
+                    <p>未来也会一直一直顺利！！</p>                
+                    <p>我会一直一直爱你！！！我的地球不能没有你！！！</p>                
+                </div>
+                <div class="fan-ending-signature">—— 加一</div>
+                <div class="fan-ending-image">
+                    <img src="img/专辑.jpg" alt="落款小图·日常一角" loading="lazy">
+                </div>
+            </div>
+        </div>
+        <div style="height: 40px;"></div>
+    </div>
+
+    <!-- ===== 留言板（账号系统整合） ===== -->
+    <div class="page-box" id="page-message">
+    <h2 class="msg-title">留言板</h2>
+    <!-- 仅留渲染容器 -->
+    <div id="waline"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script>
+        // ===== 原有脚本完全保留，一字不改 =====
+        // 页面切换
+        const navBtns = document.querySelectorAll('[data-target]');
+        const allPages = document.querySelectorAll('.page-box');
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const popMask = document.getElementById('popMask');
+                if (popMask) popMask.classList.remove('active');
+                const targetId = this.getAttribute('data-target');
+                allPages.forEach(page => page.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+                navBtns.forEach(b => b.classList.remove('nav-active'));
+                if (targetId === 'page-home') this.classList.add('nav-active');
+                else if (targetId === 'page-member') this.classList.add('nav-active');
+                else this.classList.add('nav-active');
+            })
+        })
+
+        // 首页轮播
+        const wrap = document.querySelector('.banner-wrap');
+        const imgs = document.querySelectorAll('.banner-img');
+        const prevBtn = document.querySelector('.banner-prev');
+        const nextBtn = document.querySelector('.banner-next');
+        const dotsBox = document.querySelector('.banner-dots');
+        let index = 0;
+        const realCount = 5;
+        let isAnimating = false;
+        for (let i = 0; i < realCount; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'dot';
+            if (i === 0) dot.classList.add('active');
+            dot.dataset.index = i;
+            dotsBox.appendChild(dot);
+        }
+        const dots = document.querySelectorAll('.dot');
+
+        function updateCarousel() {
+            wrap.style.transition = 'transform 0.6s ease';
+            wrap.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+        wrap.addEventListener('transitionend', () => {
+            if (index === realCount) {
+                wrap.style.transition = 'none';
+                index = 0;
+                wrap.style.transform = `translateX(-${index * 100}%)`;
+                wrap.offsetHeight;
+                wrap.style.transition = 'transform 0.6s ease';
+            }
+            isAnimating = false;
+        })
+
+        function nextSlide() {
+            if (isAnimating) return;
+            isAnimating = true;
+            index++;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            if (isAnimating) return;
+            isAnimating = true;
+            if (index === 0) {
+                wrap.style.transition = 'none';
+                index = realCount;
+                wrap.style.transform = `translateX(-${index * 100}%)`;
+                wrap.offsetHeight;
+                wrap.style.transition = 'transform 0.6s ease';
+                index = realCount - 1;
+            } else {
+                index--;
+            }
+            updateCarousel();
+        }
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                if (isAnimating) return;
+                isAnimating = true;
+                index = Number(dot.dataset.index);
+                updateCarousel();
+            })
+        })
+        let timer = setInterval(nextSlide, 10000);
+        document.querySelector('.banner').addEventListener('mouseenter', () => clearInterval(timer));
+        document.querySelector('.banner').addEventListener('mouseleave', () => timer = setInterval(nextSlide, 5000));
+
+        document.addEventListener('DOMContentLoaded', function() {
+            //气泡弹窗
+            const stackItems = document.querySelectorAll('.stack-item');
+            const popMask = document.getElementById('popMask');
+            const popClose = document.getElementById('popClose');
+            const popContent = document.getElementById('popContent');
+            if (popMask && popClose && popContent) {
+                stackItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const text = item.dataset.text;
+                        popContent.innerText = text;
+                        if (item.dataset.center === "1") {
+                            popContent.classList.add("center-text");
+                        } else {
+                            popContent.classList.remove("center-text");
+                        }
+                        popMask.classList.add('active');
+                    })
+                })
+                popClose.addEventListener('click', () => popMask.classList.remove('active'));
+                popMask.addEventListener('click', (e) => {
+                    if (e.target === popMask) popMask.classList.remove('active');
+                })
+            }
+
+            //图片放大弹窗
+            const imgModal = document.getElementById('imgModal');
+            const modalPhoto = document.getElementById('modalPhoto');
+            const imgClose = document.querySelector('.img-close');
+            const thumbImgs = document.querySelectorAll('.timeline-img');
+            thumbImgs.forEach(box => {
+                box.addEventListener('click', function() {
+                    const src = this.dataset.src;
+                    modalPhoto.src = src;
+                    imgModal.classList.add('active');
+                })
+            })
+
+            function closeImgModal() {
+                imgModal.classList.remove('active');
+                modalPhoto.src = "";
+            }
+            imgClose.addEventListener('click', closeImgModal);
+            imgModal.addEventListener('click', function(e) {
+                if (e.target === imgModal) closeImgModal();
+            })
+
+            // ===== 反深代词 CoverFlow 轮播逻辑 =====
+            const coverItems = document.querySelectorAll('.cover-item');
+            const coverPrev = document.querySelector('.cover-prev');
+            const coverNext = document.querySelector('.cover-next');
+            let currentCoverIndex = 0;
+            const totalCover = coverItems.length;
+
+            const albumData = [
+                { title: "蜃楼", track: [{ name: "蜃楼", time: "3:46", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=mWLE5QfHyfwZ" }] },
+                { title: "重启", track: [{ name: "重启", time: "4:07", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=bGm7aVgibQbu" }] },
+                { title: "记忆商店", track: [{ name: "记忆商店", time: "3:04", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=PrVV5njibXkr" }] },
+                { title: "警报", track: [{ name: "警报", time: "3:43", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=eqW6Qhjibgya" }] },
+                { title: "少管我", track: [{ name: "少管我", time: "3:59", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=QsS3Gagibtki" }] },
+                { title: "嗨", track: [{ name: "嗨", time: "4:00", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=sECX10MWGHMX" }] },
+                { title: "缝合", track: [{ name: "缝合", time: "5:03", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=jLAM0Fu0P32Z" }] },
+                { title: "Wala li longla", track: [{ name: "Wala li longla", time: "3:10", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=pVWq06qde2GR" }] },
+                { title: "空壳", track: [{ name: "空壳", time: "4:33", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=kEbGaaRe1GO" }] },
+                { title: "没关系", track: [{ name: "没关系", time: "3:37", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=54IDM7xp086O" }] },
+                { title: "请我不改", track: [{ name: "请我不改", time: "3:39", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=rh23nwCi0kNB" }] },
+                { title: "虚构", track: [{ name: "虚构", time: "5:56", link: "https://c6.y.qq.com/base/fcgi-bin/u?__=EGfu351950eF" }] }
+            ];
+
+            const titleDom = document.querySelector('.album-title');
+            const trackWrap = document.querySelector('.track-list');
+            const introTextDom = document.getElementById('albumIntro');
+
+            const albumIntroMap = {
+                "蜃楼": ">>>《Mirage》<br>无论现在还是未来，<br>我们的内心深处都一定保有一方绿洲，<br>那些让我们执着的念想：<br>是某个人、某件事、某个场景，<br>以一种可望而不可及的距离，以缺憾或希望的形式，<br>成为了心底的执念。<br>有人因执念困在原地。<br>有人靠执念继续前行。<br>执念在心底幻化成想像的蜃楼，<br>它们具体又幻象，疏离又遥远，<br>但让人们更明白作为生命存在和守护的意义。<br>你看到的蜃楼是什么样子呢？<br>你心底还放不下的执念，是什么呢？",
+                "重启": ">>>《Restart》<br>如果有机会重启人生，<br>将这一切重新来过，<br>是否能弥补所有遗憾，<br>拥有一个完美人生？<br>200年后的世界，<br>每个人都拥有“重启”的机会。<br>可以随时带着记忆重新开始，<br>去弥补曾经的遗憾。<br>但当再次经历过去，<br>感受最初的美好；<br>修正所有的错误，<br>人生就真的完美无缺了吗？<br>如果是你，会选择按下重启按钮吗？",
+                "记忆商店": ">>>《The Memory Store》<br>200 年后的世界，<br>美好的记忆都可以购买。<br>所有的美好瞬间，<br>熟悉的幸福时刻，<br>都被商家提取出来售卖。<br>有一位顾客，<br>找遍了所有的记忆商店，<br>想找回儿时拥有过的普通秋千，<br>却总是失落而归，<br>怎么也找不到。<br>今天的他，<br>又被店家推荐了 —— <br>没噩梦的睡眠、真实的拥抱、最新款的流星雨等等货品，<br>但在这些所有漂浮的美好里，<br>他只是单纯想买一个落地的朴实心愿罢了。",
+                "警报": ">>>《The Giver》<br>200年后的世界，<br>每个人都会配备一只AI小机器人陪伴成长。<br>观察记录主人的行为情感。<br>有一只小机器人，<br>发现过于善良的主人，<br>不停在人际关系的上游、中游或下游付出所有，<br>却看不见自己快要断流，<br>伤得越重笑得越轻松，<br>内心越痛笑得越隆重。<br>久而久之，<br>主人状态越来越差，<br>情绪价值被耗空，<br>机器人向主人发出警报，<br>希望主人能够先好好保护自己。<br>但无奈，警报无人听懂，<br>最终人工智能也学会了心痛。",
+                "少管我": ">>>《Shao Guan Wo (Watch Ur Manners)》<br>200年后的世界，<br>人类不再被地理位置限制，<br>随时都可以开启一场想去哪里就去哪里的旅行，<br>随时可以变化成任何场景的任何事物，<br>可以成为风中飘散的花,<br>飘到水星，或者坠入泥巴，<br>也许不讨你喜欢？<br>但当我开启这场旅行的时候，<br>请你，<br>少管我！！！",
+                "嗨": ">>>《Say Hi》<br>200年后的世界，<br>一个寻常的下午，<br>一位拾荒者被一抹异常的反光所吸引，<br>一块不属于现代的古老金属破土而出。<br>经过一阵茫然地摸索触碰，<br>“哦~说声嗨”<br>一个带着些微噪音的声音响起，<br>拾荒者迟疑地看着眼前古怪的“机器”。<br>“嗨？”<br>那个平常的下午，<br>越来越多的人从四面八方赶来。<br>他们站在废墟之上，<br>一起屏气凝神，<br>听温柔的歌声，<br>在整个天空中缓缓流淌。<br>而那个200年前的男孩对此一无所知，<br>他只是不知疲倦地唱着，<br>温柔地吟唱着：<br>“哦说声嗨，<br>知道你一定会来。”<br>当人类随时都可以传送到任何想去的地方，<br>人们会因为没有阻碍的见面而变得更相爱吗？",
+                "缝合": ">>>《Fix You》<br>在200年后的世界，<br>所有受伤的人类都会被一种神奇的机器人缝合。<br>成年机器人负责缝合大人，幼年机器人负责缝合孩子，<br>它们组成家庭，协同工作。<br>而所有人类的伤口最终都会愈合，<br>除了一个部位…<br>某天，一只幼年缝合机器人向它的父母求助：<br>“这颗孩子的心，昨天明明缝上了，今天伤口却崩开了…”<br>同样是缝合机器人的父母却露出习以为常的笑容：<br>“大人的心也是一样难缝啊…<br>不过，等你多缝几次就会习惯啦。”<br>小机器人下意识敲了敲自己的胸口——<br>金属外壳里传来空洞的回声。<br>“一个没有心的机器人，能缝好一颗流血的心吗？”<br>它想。<br>小机器人决定和父母交换工作对象，<br>它想找到“彻底缝合”的答案。<br>在父母的陪伴和注视下，<br>它满怀期待地打开成年人类的胸腔——<br>误解、遗憾、愧疚、无奈、自责、痛苦……<br>情绪的重重疤痕新旧交错，<br>覆盖在一颗正在滴血的心脏之上。<br>我们真的无法缝合对方的心，对吗？爸爸、妈妈…”<br>“也许吧…但是只要心脏依然在跳着，我们就有再重新缝合的机会。”",
+                "Wala li longla": ">>>《Wala li longla》<br>200年后的世界，<br>日新月异的科技终于突破奇点，<br>那些只存在于传说里的幻想之物，<br>终于变成了现实。<br>某天，人们收到了一则全息短信。<br>一只虚拟精灵跳到眼前。<br>“重磅新闻！<br>人类史上最著名的烂尾建筑，终于在今日完工啦！<br>来，快跟我一起去看看吧！<br>Wala li longla！”<br>“Wala…什么？”<br>他们被一股奇妙的力量轻轻托起。<br>歌声伴着光芒渐渐散<br>去，<br>人们仰起头，<br>庞大不可名状之物矗立眼前——<br>一座通天塔。<br>敬畏和惊愕中，<br>一团闪烁的星芒尖叫着，<br>顺着螺旋阶梯轻盈滑下：<br>“欢迎来到「巴别塔——2224 CE无界沟通全宇宙」的揭幕现场！<br>只要你只要念一句<br>Wala li longla！<br>就能听懂任何一个TA的话！<br>没错！<br>这是为整个宇宙所有物种提供沟通服务的超级解码器。<br>只要你们愿意，<br>就可以自由共享彼此的一切！<br>文化记忆、历史故事、身份认同、情感共鸣…<br>不再有误解，也不再有隔阂！<br>来，<br>奔向你的TA！<br>跟我一起念！！<br>Wala li longla！！！”<br>喃喃的念白如雷声般滚滚而来，<br>一个个梦幻的气泡渐次浮起。<br>一道道同频的信号划过天穹，<br>被白色巨塔的塔尖不断接收又不断发出。<br>要是有人站在地面极目向上望，<br>还能瞥见一个轻快的残影绕着塔身翩翩飞舞。<br>快乐的歌声从天空飘然落下，<br>“Wala li longla！！！”",
+                "空壳": ">>>《Shen》<br>200年后的世界，<br>新的智慧生命可以从共同的想象力中诞生。<br>一个念头被飞速传播获得了广泛共鸣后，<br>抽象的愿景就会长出具象的血肉。<br>“假如有一个装不满的树洞，<br>能带走我所有的心事，<br>该有多好。”<br>于是，一个名为空壳的“树洞”出生了。<br>大雾弥漫的清晨，<br>一个缓慢靠近的巨影逐渐显形。<br>人们走向它，<br>或眷恋或释然地抚过粗糙的壳身，<br>把沉甸甸的信物交给它，<br>“我爱你，再见。”<br>落袋的回声出乎意料的温柔，<br>如海底传来的悠长鲸鸣。<br>隐秘被收藏，情绪被接纳；<br>心声被聆听，信任被珍重。<br>装满信物的空壳乘着星光离去，<br>向下一个目的地出发。<br>它抱紧身后的行囊，<br>犹如抱紧无数人黑甜的梦乡，<br>“谢谢，再见。<br>你不会被弄丢，<br>我们终将重逢。”",
+                "没关系": ">>>《Life is Like a Box of Chocolates》<br>200年后的世界，<br>幸福指数能够被AI观测并准确读取。<br>如果你感觉自己的情绪出现了问题，<br>可以前往「幸福制造工作室」寻求帮助。<br>某天，幸福机器人迎来了它的第19920929名咨询者。<br>“我觉得生活太窒息了…”<br>面前的监视器上跳出红色的警告字样，<br>它平静地移开视线：<br>“您的幸福指数显示在正常范围。”<br>“啊？可是我真的很差劲…”<br>“看您的脸色，是不是没睡好？”<br>“持续熬夜…赶工作进度…但还是怎么做怎么都不对…”<br>“没关系”，<br>幸福机器人一边说一边走进“后台”字样的门：<br>“这是最新研发出来的产品，刚刚面市。”<br>返回后它递上一个精致的纸包，<br>“祝你睡个好觉。”<br>“下一位，请进。”<br>“和父母大吵一架…”<br>“重要的考试失败了…”<br>“收到了分手短信…”<br>“最好的朋友不再联系了…”<br>闪烁的红光间或跳动在幸福机器人的虹膜上。<br>它用安静的温柔聆听，<br>“其实，都没关系。”<br>“痛快哭一场。”<br>“好好睡一觉。”<br>“笑笑也无妨。”<br>“别勉强自己。”<br>“做不到也没关系。”<br>…<br>人们带着机器人的馈赠心满意足地离去，<br>拆开纸包吞下情绪的解药——<br>苦涩褪去后，一丝回甘涌上心头，<br>生活即将迎来崭新的一天。<br>台前的工作结束了，<br>幸福机器人按照惯例测量自己。<br>绿色的提示框弹出：<br>“您的心情指数：非常幸福！”<br>它拉开“后台”的门，<br>“吱呀”——<br>一间小小的巧克力手工作坊映入眼帘。<br>环视着空荡荡的货架，<br>它满意地点点头：<br>“研发了那么久的新口味果然很受欢迎，<br>明天也要再努力一点才行呢。”",
+                "请我不改": ">>>《Brave Heart》<br>200年后的世界，<br>大多数的仿生人由「核芯」和「躯壳」组成。<br>只有极少数的仿生人还拥有「灵魂」——<br>一个微小概率的产物，<br>在核芯和躯壳完美融合后方能出现。<br>灵魂的孕育既随机又漫长，<br>犹如一颗天然珍珠的诞生，<br>是沙粒和蚌壳拥抱彼此的奇迹。<br>「深渊」仿生人研究中心内。<br>「核芯实验室」的工程师敲打着键盘，准备验收新一批的核芯。<br>“都很不错…那么，有谁愿意成为最好的核芯吗？有灵魂的那种！”<br>“我愿意！我愿意！”<br>无数电流在空中划过，火花噼啪作响。<br>“即使要在黑暗里一直等待？和躯壳融合的时长是无法预估的…”<br>空气安静了下来。<br>一片沉默中，角落里忽然传来了信号波动：<br>“我愿意。”<br>工程师循着信号来源望去，发现是一个看上去平平无奇的核芯。<br>“你不害怕失败吗？”<br>“我生来渴望冒险。”<br>隔壁的「躯壳车间」里，<br>一位工程师在一众仿生躯壳之间走走停停，仔细检查。<br>“你的肢体结构不错。”<br>“你的细节很棒。”<br>“你和人类几乎一模一样。”<br>仿生躯壳们回应道：“谢谢夸奖！”“当然了！”“我就是最好的！”<br>工程师停在一个不起眼的小人儿面前，<br>“诶？触感过于柔软了…嘶，你竟然会被划伤啊，这可不太实用…”<br>它抬起一直低着的头：“没关系，我会慢慢愈合的。”<br>「深渊」研究中心的最深处，<br>是仿生人诞生的温床「生命之海」，<br>核芯们和躯壳们在此相见了。<br>生命的海浪涌起，<br>奇妙的命运碰撞——<br>200年前，一粒冒险的沙粒跌进了一枚坚忍的蚌壳，<br>200年后，一粒勇敢的核芯遇见了一枚温柔的躯壳。<br>一个「我」在黑暗里蜷缩着静静等待，<br>一个「我」用血和泪将伤口轻轻包裹。<br>两个虚影悄然重叠，<br>一团光晕渐渐亮起。<br>柔软、脆弱、安静，<br>是躯壳，也是核芯，是一半的灵魂；<br>坚硬、浪漫、璀璨，<br>是核芯，也是躯壳，是另一半灵魂。<br>十年后。<br>一个仿生人从黑暗中睁开双眼。<br>胸中悸动着熠熠生辉的，<br>是一颗如珍珠般的灵魂。<br>它默念道：<br>“请我不改。”",
+                "虚构": ">>>《The Mask》<br>200年后的世界，<br>机器人技术在不断地进步突破，<br>但型号的更新迭代却难以解答200年前出发时的疑惑：<br>“机器人是否能成为真正的人？<br>人类是否真的能共情机器人？”<br>一只报废的小机器人在高高的废墟顶端醒来，<br>它举起残缺的肢体，摸上锈蚀的面孔。<br>一阵风从它胸前的空洞穿过，<br>发出奇异而悠扬的声响。<br>“我在垃圾堆里呆了这么久，从没听过这种声音。”<br>一位古早型号机器人路过，停下来倾听。<br>“那是我的芯片，它还没坏。”<br>小机器人答道，“或许我能成为一名歌手？”<br>“这是不可能的。众所周知，只有人类才能成为歌手。”<br>山中不知岁月长。<br>搜索，挖掘，拆解，拼凑，缝合，<br>小机器人跌跌撞撞地修好了自己，<br>还天才地制造出一张伪装人脸的全息面具。<br>它混入了只允许人类参赛的“宇宙第一歌姬大会”，<br>在垃圾堆里每天哼唱的歌谣，<br>意外地受到了观众们的喜爱。<br>决赛当天。<br>偌大的会场座无虚席。<br>“…今天将决出全宇宙最好的歌手！TA还将获得一个「万能许愿」的机会！无论什么心愿都能实现！让我们拭目以待谁能脱颖而出…”<br>后台的休息室。<br>“我早就想好了，我要许愿变成一个真正的人。”<br>它望向镜子里漂亮的人类面孔，甜甜地笑了。<br>小机器人从未唱得如此投入，<br>最后一个音符消散之际，<br>它哭了。<br>本不属于硅基生命的液体滑下，<br>在全息面具上侵蚀出一丝裂缝，<br>一抹金属反光刺入观众们的眼眸。<br>小机器人赢了。<br>一无所知的它仰起脸：“那我可以许愿了吗？”<br>“你的愿望已经实现了。”<br>一个温柔的声音从头顶响起，<br>“看看你自己。”<br>一只虚幻的手拂过它的泪痕。<br>“什么？可我还是金属的啊？”<br>它惊愕地摸上自己的脸，坑洼的瘢痕冰凉一片。<br>“这是我的脸…面具呢？”<br>小机器人想逃跑，<br>却迈不开腿。<br>“被看见了…”<br>震耳欲聋的掌声和喝彩声汇聚成一股澎湃的声浪，<br>将它牢牢地钉在原地。<br>“唱得太好了！”“真好听啊！”<br>“你们…不讨厌我？”<br>“我们爱你！”<br>“可是…你们爱上的是虚构的我…”<br>“不对！我们爱的就是真实的你！”<br>那滴被歌声注入感情的眼泪，让它成为了一个真正的人。<br>那些和它同频共振的声音，让它成为了一个真正的歌手。<br>“谢谢你们，愿意看见我。”<br>一个锈迹斑斑的小机器人站在舞台中央，甜甜地笑了。"
+            };
+
+            function renderCoverStyle() {
+                coverItems.forEach(item => {
+                    item.classList.remove(
+                        'active-center', 'side-left-1', 'side-left-2', 'side-left-3',
+                        'side-right-1', 'side-right-2', 'side-right-3',
+                        'far-left', 'far-right'
+                    );
+                });
+                coverItems.forEach((item, idx) => {
+                    const diff = idx - currentCoverIndex;
+                    if (diff === 0) {
+                        item.classList.add('active-center');
+                    } else if (diff === -1) {
+                        item.classList.add('side-left-1');
+                    } else if (diff === -2) {
+                        item.classList.add('side-left-2');
+                    } else if (diff === -3) {
+                        item.classList.add('side-left-3');
+                    } else if (diff === 1) {
+                        item.classList.add('side-right-1');
+                    } else if (diff === 2) {
+                        item.classList.add('side-right-2');
+                    } else if (diff === 3) {
+                        item.classList.add('side-right-3');
+                    } else if (diff < -3) {
+                        item.classList.add('far-left');
+                    } else if (diff > 3) {
+                        item.classList.add('far-right');
+                    }
+                });
+                const data = albumData[currentCoverIndex];
+                titleDom.innerText = data.title;
+                trackWrap.innerHTML = "";
+                data.track.forEach((t, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'track-item';
+                    const link = t.link || '#';
+                    div.innerHTML = `
+                        <a href="${link}" target="_blank" class="track-name-wrap">
+                            <span class="play-icon">▶</span>
+                            <span>${t.name}</span>
+                        </a>
+                        <span class="track-duration">${t.time}</span>
+                    `;
+                    div.querySelector('a').addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                    trackWrap.appendChild(div);
+                });
+
+                const title = data.title;
+                if (introTextDom) {
+                    const defaultIntro = `「${title}」是周深「反深代词」专辑中的一首作品，以独特的音乐语言传递情感与思考。`;
+                    introTextDom.innerHTML = `<em>「${title}」</em> ${albumIntroMap[title] || defaultIntro}`;
+                }
+            }
+            renderCoverStyle();
+
+            coverNext.addEventListener('click', () => {
+                if (currentCoverIndex < totalCover - 1) {
+                    currentCoverIndex++;
+                    renderCoverStyle();
+                }
+            })
+            coverPrev.addEventListener('click', () => {
+                if (currentCoverIndex > 0) {
+                    currentCoverIndex--;
+                    renderCoverStyle();
+                }
+            })
+            coverItems.forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    if (i !== currentCoverIndex) {
+                        currentCoverIndex = i;
+                        renderCoverStyle();
+                    }
+                })
+            })
+
+            // ===== 相识相遇 · CoverFlow 竖条视频画廊（独立初始化） =====
+            function initAlbumGallery() {
+                const albumVideoData = [
+                    { id: 0, title: '开始推理吧', meta: '因为周可可，我认识到了一个超可爱的你', desc: '　　没想到，比起认识周深，我竟然先认识了可可。<br>　　但是其实我很早就知道了周深，不过不太熟悉，毕竟大鱼啊，达拉崩吧这么火，远近闻名来了。<br>　　但有些感情需要一个契机和一个缘分。<br>　　我嘛，只是在暑假随手打开了一个综艺，一眼看到了这个可爱的，活泼的，萌萌的周三岁。我说：我去！这是谁！太可爱了，太好玩了……<br>　　所以这才是故事的开端，所以我开始了解你', cover: 'img/video1.jpg', video: 'https://player.bilibili.com/player.html?bvid=BV1Ag41167Zi&autoplay=1' },
+                    { id: 1, title: '能解答一切的答案', meta: '干净，纯白，天使般的声音', desc: '　　那时候是23年，认识周深必不可少的需要打开《歌手》，我不是很喜欢看竞技类的音综，所以我只是挑了周深的舞台看。<br>　　我记得很清楚，我的妹妹当时在我边上吵着要换别的电视看，而加一我已经沉迷了。<br>　　是《能解答一切的答案》，疫情的时候在家里录的，没有炫酷的灯光或者妆造，但是白色的画面好干净……<br>　　和他的声音一样干净，纯粹，像天使……<br>　　把一个那些日子里焦躁迷茫的心抱在怀中，静静安抚……<br>　　好喜欢他的声音！', cover: 'img/video2.jpg', video: 'https://player.bilibili.com/player.html?bvid=BV117411F7nN&autoplay=1' },
+                    { id: 2, title: '深深谢谢你啦', meta: '因为八周年的这封信我就喜欢上你了', desc: '　　我觉得一见钟情就是这样吧，很迅速的我开始查找关于这个人的一切，我想看看他到底是什么样的。<br>　　就是很巧，那天也是7月25日，出道日的八周年纪念日，他唱了他自己写给粉丝的歌。<br>　　我当时并不是他的粉丝，但我的眼泪还是掉下来了。<br>　　怎么会有这么真诚真心的人，我想写出这样歌的人一定很爱他的粉丝，而他的确是这样。<br>　　所以我真的开始喜欢他，只是因为真心！', cover: 'img/video3.jpg', video: 'https://player.bilibili.com/player.html?bvid=BV1DF411P7Sw&autoplay=1' },
+                    { id: 3, title: '929生日', meta: '2024 · 我真正意义上陪你过的第一个生日', desc: '　　那时候还是高中，没有手机的可怜学生，没有多少时间能回来一直上网。<br>　　包括生日直播<br>　　但其实我很快就毕业了。<br>　　真的是很久不怎么见到，所以上大学的第一个生日直播我就守在电脑前，一步不舍得离开，这是我第一次“陪着你”过生日，而不是只是为你过生日<br>　　坐在电脑前面唱歌的小深感觉是世界上最幸福的人了<br>　　坐在电脑前听你唱歌的我也是', cover: 'img/video4.jpg', video: 'https://player.bilibili.com/player.html?isOutside=true&aid=113221897884768&bvid=BV1nJxmedEyV&cid=26066487791&p=1' },
+                    { id: 4, title: '9.29苏州演唱会', meta: '在我生日这天，你陪我过的', desc: '　　苏州演唱会那天是我的生日，并且我抢到了票。<br>　　这一切都像是命中注定，你也可以陪我过生日了。<br>　　苏州其实真的很远，解决了车票、住宿还有征得家里人的同意，我义无反顾的就出发了，不会错过什么风景，去见你的一路上都是风景。<br>　　当你的第一句声响起来的时候，我就忍不住哭。声音真实的频率真的不一样，只是我知道你真的在我眼前。<br>　　这次不是从视频里听到的……', cover: 'img/video5.jpg', video: 'https://player.bilibili.com/player.html?isOutside=true&aid=113457869430736&bvid=BV189mqYEE9a&cid=26698190042&p=1' },
+                    { id: 5, title: '泉州咪咕汇', meta: '我想多一个我，你应该会更开心', desc: '　　泉州咪咕汇，离我很近。<br>　　因为是一个颁奖典礼，所有人都希望能在场上让深深看到我们，看到我们来支持他。<br>　　所以我想去，我能做的真的好少，我没什么能做的来告诉深深我真的很爱他，而且我想他了……<br>　　所以我去了！<br>　　那天下的雨特别大，我们都没走，但是小深把伞扔掉的时候，我觉得……我好像更爱他了', cover: 'img/video6.jpg', video: 'https://player.bilibili.com/player.html?isOutside=true&aid=114366171059803&bvid=BV1fz5tz8Etp&cid=29508570704&p=1' },
+                    { id: 6, title: '我以渺小爱你', meta: '我以短暂爱你不朽的旅程', desc: '　　到现在已经有很多很多对我们意义重要的歌了。但是对于我来说，《我以渺小爱你》永远是我们同频的那首<br>　　第一次看这些词的时候，我就想，这个周深不会又要开始“何德何能”了吧，果然……<br>　　我真的真的很喜欢你，我有时候也觉得我对你的爱真的好小，我其实不能为你做什么<br>　　但我们不管有没有觉得自己渺小，有没有觉得亏欠，我们都会在同行的这趟旅程中一直爱彼此。<br>　　我会陪着周深唱到一百八十岁的！', cover: 'img/video7.jpg', video: 'https://player.bilibili.com/player.html?isOutside=true&aid=113216193565734&bvid=BV1EWxieWEzD&cid=26051676962&p=1"' },
+                    { id: 7, title: '深深的福州演唱会', meta: '你来我家看我了诶', desc: '　　福州！演唱会！<br>　　来我的家门口啦！一下子有实感就是你说的你会到我们家来看我们，所以你真的来啦。<br>　　因为在福州，所以对路途的熟悉减少了好奇心，更多了一点要见面的期待和兴奋。我其实已经忘记那天是什么样了，像一场梦……<br>　　我只记得我出来的时候就开始想你了。<br>　　我们什么时候下一次见面啊！', cover: 'img/video8.jpg', video: 'https://player.bilibili.com/player.html?isOutside=true&aid=115412096323721&bvid=BV1YGW9z7Er4&cid=33275514784&p=1"' }
+                ];
+
+                const totalVideos = albumVideoData.length;
+                let currentIdx = 0;
+                let isTransitioning = false;
+                const SPACING = 120;
+
+                const container = document.querySelector('#album-gallery-root .card-container');
+                const panel = document.querySelector('#album-gallery-root .panel-content');
+                const leftArrow = document.querySelector('#album-gallery-root .nav-arrow-left');
+                const rightArrow = document.querySelector('#album-gallery-root .nav-arrow-right');
+                const modal = document.querySelector('#album-gallery-root .video-modal');
+                const closeBtn = document.querySelector('#album-gallery-root .modal-close');
+                const playerContainer = document.querySelector('#album-gallery-root .fake-player');
+
+                function triggerPlay() {
+                    const data = albumVideoData[currentIdx];
+                    if (data && data.video) {
+                        if (playerContainer) {
+                            let embedUrl = data.video;
+                            if (!embedUrl.includes('autoplay')) {
+                                embedUrl += (embedUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+                            }
+                            playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="300" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" style="border-radius:12px;"></iframe>`;
+                        }
+                        modal.classList.add('active');
+                    } else {
+                        alert('暂无视频链接');
+                    }
+                }
+
+                function closeModal() {
+                    modal.classList.remove('active');
+                    if (playerContainer) {
+                        playerContainer.innerHTML = `
+                            <i class="fas fa-film" style="font-size: 44px; opacity: 0.2; margin-bottom: 16px; display: block;"></i>
+                            <span style="font-weight: 300; letter-spacing: 1px; color: #2a6bb0;">「反深代词」· 线上首唱</span>
+                        `;
+                    }
+                }
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+                function updateArrows() {
+                    if (leftArrow) leftArrow.classList.toggle('disabled', currentIdx === 0);
+                    if (rightArrow) rightArrow.classList.toggle('disabled', currentIdx === totalVideos - 1);
+                }
+
+                let cardRefs = [];
+
+                function renderCards(centerIndex) {
+                    if (!container) return;
+                    container.innerHTML = '';
+                    cardRefs = [];
+
+                    for (let i = 0; i < totalVideos; i++) {
+                        const offset = i - centerIndex;
+                        const data = albumVideoData[i];
+                        const card = document.createElement('div');
+                        card.className = 'cover-card';
+                        const isCenter = (i === centerIndex);
+                        if (isCenter) card.classList.add('center');
+
+                        const absOffset = Math.abs(offset);
+                        let scale, opacity, zIndex;
+                        if (absOffset === 0) { scale = 1; opacity = 1; zIndex = 20; }
+                        else if (absOffset === 1) { scale = 0.84; opacity = 0.75; zIndex = 15; }
+                        else if (absOffset === 2) { scale = 0.74; opacity = 0.60; zIndex = 10; }
+                        else if (absOffset === 3) { scale = 0.66; opacity = 0.48; zIndex = 6; }
+                        else { scale = 0.58; opacity = 0.30; zIndex = 3; }
+
+                        const xOffset = offset * SPACING;
+                        card.style.transform = `translateX(${xOffset}px) scale(${scale})`;
+                        card.style.opacity = opacity;
+                        card.style.zIndex = zIndex;
+                        card.style.filter = isCenter ? 'grayscale(0) saturate(1)' : 'grayscale(0.7) saturate(0.5)';
+
+                        const thumb = document.createElement('div');
+                        thumb.className = 'cover-thumb';
+                        if (data.cover) {
+                            thumb.style.background = `url('${data.cover}') center center / cover no-repeat`;
+                        } else {
+                            const hue = 210 + (i * 8) % 20;
+                            thumb.style.background = `linear-gradient(145deg, hsl(${hue}, 40%, 92%), hsl(${hue + 10}, 30%, 85%))`;
+                        }
+                        thumb.innerHTML = `<i class="fas fa-play-circle"></i>`;
+
+                        const label = document.createElement('span');
+                        label.className = 'card-label';
+                        label.textContent = `#${i+1}`;
+                        thumb.appendChild(label);
+                        card.appendChild(thumb);
+
+                        cardRefs.push({ element: card, idx: i, offset: offset, isCenter: isCenter });
+
+                        card.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (isTransitioning) return;
+                            if (i === currentIdx) {
+                                triggerPlay();
+                                return;
+                            }
+                            goToIndex(i);
+                        });
+
+                        container.appendChild(card);
+                    }
+
+                    container.style.transform = 'translateX(0px)';
+                    updateArrows();
+                }
+
+                function slideTo(targetIndex) {
+                    const delta = (targetIndex - currentIdx) * SPACING;
+                    container.style.transform = `translateX(${-delta}px)`;
+
+                    const newCenter = targetIndex;
+                    const cards = container.querySelectorAll('.cover-card');
+                    cards.forEach((card, idx) => {
+                        const cardIdx = cardRefs[idx].idx;
+                        const offset = cardIdx - newCenter;
+                        const absOffset = Math.abs(offset);
+                        const isCenter = (offset === 0);
+
+                        let scale, opacity, zIndex;
+                        if (absOffset === 0) { scale = 1; opacity = 1; zIndex = 20; }
+                        else if (absOffset === 1) { scale = 0.84; opacity = 0.75; zIndex = 15; }
+                        else if (absOffset === 2) { scale = 0.74; opacity = 0.60; zIndex = 10; }
+                        else if (absOffset === 3) { scale = 0.66; opacity = 0.48; zIndex = 6; }
+                        else { scale = 0.58; opacity = 0.30; zIndex = 3; }
+
+                        const xOffset = (cardIdx - newCenter) * SPACING;
+                        card.style.transform = `translateX(${xOffset}px) scale(${scale})`;
+                        card.style.opacity = opacity;
+                        card.style.zIndex = zIndex;
+
+                        if (isCenter) {
+                            card.classList.add('center');
+                            card.style.filter = 'grayscale(0) saturate(1)';
+                        } else {
+                            card.classList.remove('center');
+                            card.style.filter = 'grayscale(0.7) saturate(0.5)';
+                        }
+                        cardRefs[idx].isCenter = isCenter;
+                    });
+
+                    currentIdx = targetIndex;
+                    updateArrows();
+                }
+
+                function updatePanel(index, fade = true) {
+                    const data = albumVideoData[index];
+                    if (!data || !panel) return;
+
+                    if (fade) {
+                        panel.classList.add('fade-out');
+                        setTimeout(() => {
+                            panel.innerHTML = `
+                                <div class="panel-title">${data.title}</div>
+                                <div class="panel-meta">${data.meta}</div>
+                                <div class="panel-desc">${data.desc}</div>
+                                <div class="play-btn" id="panelPlayBtn">
+                                    <i class="fas fa-play"></i> 点击播放视频
+                                </div>
+                            `;
+                            const btn = document.getElementById('panelPlayBtn');
+                            if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); triggerPlay(); });
+                            panel.classList.remove('fade-out');
+                        }, 180);
+                    } else {
+                        panel.innerHTML = `
+                            <div class="panel-title">${data.title}</div>
+                            <div class="panel-meta">${data.meta}</div>
+                            <div class="panel-desc">${data.desc}</div>
+                            <div class="play-btn" id="panelPlayBtn">
+                                <i class="fas fa-play"></i> 点击播放视频
+                            </div>
+                        `;
+                        const btn = document.getElementById('panelPlayBtn');
+                        if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); triggerPlay(); });
+                    }
+                }
+
+                function goToIndex(targetIndex) {
+                    if (isTransitioning) return;
+                    if (targetIndex === currentIdx) return;
+                    if (targetIndex < 0 || targetIndex >= totalVideos) return;
+
+                    isTransitioning = true;
+                    slideTo(targetIndex);
+                    updatePanel(targetIndex, true);
+                    setTimeout(() => { isTransitioning = false; }, 600);
+                }
+
+                if (leftArrow) {
+                    leftArrow.addEventListener('click', () => {
+                        if (isTransitioning) return;
+                        if (currentIdx > 0) goToIndex(currentIdx - 1);
+                    });
+                }
+                if (rightArrow) {
+                    rightArrow.addEventListener('click', () => {
+                        if (isTransitioning) return;
+                        if (currentIdx < totalVideos - 1) goToIndex(currentIdx + 1);
+                    });
+                }
+
+                currentIdx = 0;
+                renderCards(0);
+                updatePanel(0, false);
+                updateArrows();
+            }
+
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                initAlbumGallery();
+            } else {
+                document.addEventListener('DOMContentLoaded', initAlbumGallery);
+            }
+
+            // ===== 生活和你 · 纯图片拼图画廊（独立初始化） =====
+            function initLifeGallery() {
+                // 每个页面的卡片配置：图片路径、尺寸样式、标题
+                const pagesLife = [{
+                    id: 0,
+                    mainTitle: '和你见面',
+                    subTitle: 'TO MEET YOU',
+                    timeMeta: '2024 — 2025',
+                    slogan: '见面真的好难啊！！',
+                    descTitle: '现场 · 我们',
+                    descBody: '我真的好喜欢见面啊，好喜欢你在舞台上唱歌闪闪发光的样子，好喜欢你跑着冲向所有人的时候脸上的幸福。',
+                    infoTime: '2024.11 — 2025.11',
+                    infoLocation: '苏州 · 泉州 · 福州',
+                    infoCategory: '演唱会 · 舞台 · 见面',
+                    cards: [
+                        { img: '111/pic1.jpg', title: '9.29hz苏州演唱会地铁大屏打卡', size: 'medium' },
+                        { img: '111/pic2.jpg', title: '9.29hz苏州演唱会入场ing', size: 'small' },
+                        { img: '111/pic3.jpg', title: '深深的福州演唱会大鱼', size: 'square' },
+                        { img: '111/pic4.jpg', title: '9.29hz苏州演唱会开唱', size: 'wide' },
+                        { img: '111/pic5.jpg', title: '泉州咪咕汇商城打卡', size: 'wide-tall' },
+                        { img: '111/pic6.jpg', title: '泉州咪咕汇荧光棒', size: 'tall' },
+                        { img: '111/pic7.jpg', title: '深深的福州演唱会借过一下', size: 'compact' },
+                        { img: '111/pic8.jpg', title: '深深的福州演唱会地铁打卡', size: 'compact' },
+                        { img: '111/pic9.jpg', title: '深深的福州演唱会商城打卡', size: 'small' },
+                        { img: '111/pic10.jpg', title: '泉州咪咕汇商城打卡', size: 'portrait' },
+                        { img: '111/pic11.jpg', title: '深深的福州演唱会地铁打卡', size: 'compact' },
+                        { img: '111/pic12.jpg', title: '深深的福州演唱会入场ing', size: 'panorama' },
+                        { img: '111/pic13.jpg', title: '深深的福州演唱会地铁打卡', size: 'small' },
+                        { img: '111/pic14.jpg', title: '泉州咪咕汇小美满', size: 'medium' },
+                        { img: '111/pic15.jpg', title: '泉州咪咕汇加一的小灯牌', size: 'compact' },
+                        { img: '111/pic16.jpg', title: '深深的福州演唱会入场ing', size: 'tall' }
+
+                    ]
+                }, {
+                    id: 1,
+                    mainTitle: '可可嫑嫑',
+                    subTitle: 'COCO&NONO',
+                    timeMeta: '2025 · 家里多了两个小孩',
+                    slogan: '可可做什么都可！嫑嫑做什么都……都好！',
+                    descTitle: '周边 · 小娃',
+                    descBody: '有可可嫑嫑陪着我诶！世界上哪来的这么可爱的小娃呀！还有其他漂亮的周边，周深是最伟大的团咪！!',
+                    infoTime: '2025.06.30',
+                    infoLocation: '福州 · 中国',
+                    infoCategory: '家乡 · 旅行',
+                    cards: [
+                        { img: '222/pic1.jpg', title: 'coconono樱有尽有', size: 'large' },
+                        { img: '222/pic2.jpg', title: '可可去旅游', size: 'small' },
+                        { img: '222/pic3.jpg', title: 'coconono来快闪店', size: 'small' },
+                        { img: '222/pic4.jpg', title: '烟台山的可可嫑嫑', size: 'medium' },
+                        { img: '222/pic5.jpg', title: 'conomi拼豆', size: 'wide' },
+                        { img: '222/pic6.jpg', title: '可可嫑嫑自拍', size: 'tall' },
+                        { img: '222/pic7.jpg', title: 'coconono野餐垫', size: 'panorama' },
+                        { img: '222/pic8.jpg', title: '可可嫑嫑小蛋糕', size: 'square' },
+                        { img: '222/pic9.jpg', title: '可可打卡生米地铁站', size: 'compact' },
+                        { img: '222/pic10.jpg', title: '可可新衣服', size: 'portrait' },
+                        { img: '222/pic11.jpg', title: '可可在洛阳', size: 'wide-tall' },
+                        { img: '222/pic12.jpg', title: '烟台山的可可嫑嫑', size: 'medium' },
+                        { img: '222/pic13.jpg', title: '嫑嫑生日徽章', size: 'stamp' }
+                    ]
+                }, {
+                    id: 2,
+                    mainTitle: '加一日常',
+                    subTitle: 'DAYS OF ADDONE',
+                    timeMeta: '2023 — 2026 · 生活',
+                    slogan: '我的人生日记肯定每页都有你',
+                    descTitle: '日常 · 小小故事',
+                    descBody: '有时候爱的很热烈，有时候喜欢的很安心，但是我知道我爱你就够了，反正我的生活一直都有你。',
+                    infoTime: '2023.07 — 2026.07',
+                    infoLocation: '中国 · 世界',
+                    infoCategory: '喜欢 · 平常 · 一直',
+                    cards: [
+                        { img: '333/pic1.jpg', title: '24生日直播', size: 'medium' },
+                        { img: '333/pic2.jpg', title: '周深元素的switch背卡', size: 'panorama' },
+                        { img: '333/pic3.jpg', title: '加一和痛包', size: 'wide' },
+                        { img: '333/pic4.jpg', title: '929生日打卡', size: 'small' },
+                        { img: '333/pic5.jpg', title: '周深vogue杂志封面', size: 'tall' },
+                        { img: '333/pic6.jpg', title: '25春晚《山鹰和兰花花》', size: 'large' },
+                        { img: '333/pic7.jpg', title: '时间之子团建活动', size: 'compact' },
+                        { img: '333/pic8.jpg', title: '福州快闪店扭蛋机', size: 'stamp' },
+                        { img: '333/pic9.jpg', title: '福州快闪店外观', size: 'panorama' },
+                        { img: '333/pic10.jpg', title: '念慈庵线下打卡', size: 'portrait' },
+                        { img: '333/pic11.jpg', title: '25生日直播', size: 'wide-tall' },
+                        { img: '333/pic12.jpg', title: '自制手账收藏周边', size: 'medium' },
+                        { img: '333/pic13.jpg', title: '加一和痛包', size: 'stamp' }
+                    ]
+                }];
+
+                let currentIndexLife = 0;
+                let isTransitioningLife = false;
+
+                const trackLife = document.getElementById('filmTrackLife');
+                const prevBtnLife = document.getElementById('prevBtnLife');
+                const nextBtnLife = document.getElementById('nextBtnLife');
+                const contentAreaLife = document.getElementById('contentAreaLife');
+                const modalLife = document.getElementById('videoModalLife');
+                const modalCloseLife = document.getElementById('modalCloseLife');
+                const modalImageLife = document.getElementById('modalImageLife');
+                const modalTitleLife = document.getElementById('modalTitleLife');
+
+                function renderPageLife(index) {
+                    const page = pagesLife[index];
+                    if (!page) return;
+
+                    contentAreaLife.classList.add('fade-out');
+                    setTimeout(() => {
+                        document.getElementById('mainTitleLife').textContent = page.mainTitle;
+                        document.getElementById('subTitleLife').textContent = page.subTitle;
+                        document.getElementById('timeMetaLife').textContent = page.timeMeta;
+                        document.getElementById('sloganTextLife').textContent = page.slogan;
+                        document.getElementById('descTitleLife').textContent = page.descTitle;
+                        document.getElementById('descBodyLife').textContent = page.descBody;
+                        document.getElementById('infoTimeLife').textContent = page.infoTime;
+                        document.getElementById('infoLocationLife').textContent = page.infoLocation;
+                        document.getElementById('infoCategoryLife').textContent = page.infoCategory;
+                        contentAreaLife.classList.remove('fade-out');
+                    }, 300);
+
+                    trackLife.innerHTML = '';
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'film-page-life';
+
+                    page.cards.forEach((card, idx) => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = `film-card-life ${card.size || 'medium'}`;
+                        // 背景色占位
+                        const hue = (idx * 30 + 210) % 360;
+                        cardDiv.style.background = `linear-gradient(135deg, hsl(${hue}, 15%, 92%), hsl(${hue + 20}, 10%, 85%))`;
+                        cardDiv.innerHTML = `
+                            <img src="${card.img}" alt="${card.title}" onerror="this.style.display='none'">
+                            <span class="card-index-life">${String(idx + 1).padStart(2, '0')}</span>
+                        `;
+                        cardDiv.addEventListener('click', () => {
+                            openImageLife(card.img, card.title);
+                        });
+                        pageDiv.appendChild(cardDiv);
+                    });
+
+                    trackLife.appendChild(pageDiv);
+                    updateArrowsLife(index);
+                }
+
+                function goToPageLife(index) {
+                    if (isTransitioningLife) return;
+                    if (index === currentIndexLife) return;
+                    if (index < 0 || index >= pagesLife.length) return;
+
+                    isTransitioningLife = true;
+                    const direction = index > currentIndexLife ? -1 : 1;
+                    const offset = direction * 100;
+
+                    trackLife.style.transform = `translateX(${offset}%)`;
+                    trackLife.style.transition = 'transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1)';
+
+                    setTimeout(() => {
+                        currentIndexLife = index;
+                        renderPageLife(index);
+                        trackLife.style.transition = 'none';
+                        trackLife.style.transform = 'translateX(0%)';
+                        trackLife.offsetHeight;
+                        trackLife.style.transition = 'transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1)';
+                        isTransitioningLife = false;
+                    }, 650);
+                }
+
+                function updateArrowsLife(index) {
+                    prevBtnLife.classList.toggle('disabled', index === 0);
+                    nextBtnLife.classList.toggle('disabled', index === pagesLife.length - 1);
+                }
+
+                function openImageLife(imgUrl, title) {
+                    if (!imgUrl) return;
+                    modalImageLife.src = imgUrl;
+                    modalTitleLife.textContent = title || '影像';
+                    modalLife.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeImageLife() {
+                    modalLife.classList.remove('active');
+                    modalImageLife.src = '';
+                    document.body.style.overflow = '';
+                }
+
+                prevBtnLife.addEventListener('click', () => {
+                    if (currentIndexLife > 0) goToPageLife(currentIndexLife - 1);
+                });
+                nextBtnLife.addEventListener('click', () => {
+                    if (currentIndexLife < pagesLife.length - 1) goToPageLife(currentIndexLife + 1);
+                });
+
+                modalCloseLife.addEventListener('click', closeImageLife);
+                modalLife.addEventListener('click', (e) => {
+                    if (e.target === modalLife) closeImageLife();
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') closeImageLife();
+                    if (e.key === 'ArrowLeft' && currentIndexLife > 0) goToPageLife(currentIndexLife - 1);
+                    if (e.key === 'ArrowRight' && currentIndexLife < pagesLife.length - 1) goToPageLife(currentIndexLife + 1);
+                });
+
+                renderPageLife(0);
+                trackLife.style.transform = 'translateX(0%)';
+            }
+
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                initLifeGallery();
+            } else {
+                document.addEventListener('DOMContentLoaded', initLifeGallery);
+            }
+
+        })
+    </script>
+    
+    <script type="module">
+    import { Waline } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+    Waline({
+        el: '#waline',
+        serverURL: 'https://waline1-lime.vercel.app/'
+    });
+    </script>
+</body>
+</html>
